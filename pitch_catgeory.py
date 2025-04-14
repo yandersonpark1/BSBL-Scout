@@ -21,9 +21,8 @@ def importantValues():
 def outliers(): 
     pass
     
-#The average d3 baseball pitcher throws 77-82 mph 
-#Categorizes Fastballs
-def fastballType(file): 
+#creates File for only fastball data for Rapsodo
+def fastballFile(file): 
     fastball_velo = ""
     fastball_type = ""
     profile = ""
@@ -42,10 +41,84 @@ def fastballType(file):
     
     
     #Filters through grading fastball
-    def classify(row):
+    def fastballClassifyFile(row):
+    
+    
         vel = row["Velocity"]
         hb = row["HB (trajectory)"]
         vb = row["VB (trajectory)"]
+        
+        #Pitch-Velo Classification
+        if vel < 79: 
+            fastball_velo = ("bad ")
+        elif vel >= 79 and vel <= 83:
+            fastball_velo = ("average")
+        elif vel >= 84 and vel <= 88: 
+            fastball_velo = ("great")
+        else: 
+            fastball_velo = ("elite")
+        
+        #Pitch type classification - (Cutters, Fastballs, Two-Seams)
+        if abs(hb) <= 5:
+            fastball_type = ("Cutter") 
+        elif abs(hb) > 5 and abs(hb) <= 16:
+            fastball_type = ("Four-Seam")
+        else: 
+            fastball_type = "Two-Seam"
+
+        #Pitch Type - VB Classification
+        if vb < 12: 
+            if fastball_type == "Cutter": 
+                fastball_type = "Cutter"
+            elif fastball_type == "Four-Seam":
+                fastball_type = "Dead-Zone Fastball"
+            else: 
+                fastball_type = "Sinker"
+        elif vb >= 12 and vb <= 16:
+            if fastball_type == "Cutter": 
+                fastball_type = "Cutter"
+            elif fastball_type == "Four-Seam":
+                fastball_type = "Dead-Zone Fastball"
+            else: 
+                fastball_type = "Two-Seam"
+        else: 
+            if fastball_type == "Cutter": 
+                fastball_type = "Cut-Ride Fastball"
+            elif fastball_type == "Four-Seam":
+                fastball_type = "Carry Fastball"
+            else: 
+                fastball_type = "Ride-Run Fastball"
+        
+        profile = f"{fastball_type} with a velocity of {vel} mph which is {fastball_velo}." 
+        return profile
+    
+    #Applies classification to dataframe
+    df_fb[profile] = df_fb.apply(fastballClassifyFile, axis=1)
+    return df_fb[profile]
+
+def fastballAverage(file): 
+    profile = ""
+    
+    #Reads file
+    df = pd.read_csv(file, usecols = importantValues())
+    df_fb = df.copy()
+    
+    #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
+    df_fb = df_fb[df_fb["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
+    
+    df_fb["Velocity"] = pd.to_numeric(df_fb["Velocity"], errors='coerce')
+    df_fb["VB (trajectory)"] = pd.to_numeric(df_fb["VB (trajectory)"], errors='coerce')
+    df_fb["HB (trajectory)"] = pd.to_numeric(df_fb["HB (trajectory)"], errors='coerce')
+    df_fb = df_fb.dropna()
+    
+    fastball_avg_velo = df_fb["Velocity"].mean()
+    fastball_avg_VB = df_fb["VB (trajectory)"].mean()
+    fastball_avg_HB = df_fb["HB (trajectory)"].mean()
+    
+    def fastballClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB):
+        vel = fastball_avg_velo
+        hb = fastball_avg_HB
+        vb = fastball_avg_VB
         
         #Pitch-Velo Classification
         if vel < 79: 
@@ -91,13 +164,19 @@ def fastballType(file):
         profile = f"{fastball_type} with a velocity of {vel} mph which is {fastball_velo}." 
         return profile
     
+    return {
+    "Velocity": fastball_avg_velo,
+    "VB": fastball_avg_VB,
+    "HB": fastball_avg_HB, 
+    "Profile": fastballClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB)
+    }
 
     
-    #Applies classification to dataframe
-    df_fb[profile] = df_fb.apply(classify, axis=1)
-    return df_fb[profile]
+    
+    
 
-def sliderType(file): 
+
+def sliderFile(file): 
     slider_velo = ""
     slider_type = ""
     profile = ""
@@ -114,7 +193,7 @@ def sliderType(file):
     df_sl["HB (trajectory)"] = pd.to_numeric(df_sl["HB (trajectory)"], errors='coerce')
     df_sl = df_sl.dropna()
     
-    def classify(row):
+    def sliderClassifyFile(row):
         vel = row["Velocity"]
         hb = row["HB (trajectory)"]
         vb = row["VB (trajectory)"]
@@ -141,7 +220,7 @@ def sliderType(file):
         return profile
     
     #Applies classification to dataframe
-    df_sl[profile] = df_sl.apply(classify, axis=1)
+    df_sl[profile] = df_sl.apply(sliderClassifyFile, axis=1)
     return df_sl[profile]
 
 #Changeup will need to use Deviations
@@ -150,11 +229,17 @@ def changeupType(file):
 
 def main(): 
     file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
-    print(cleanData(file))
-    ScatterPlot(file)
+    print((cleanData(file)))
+    print(fastballFile(file))
+    print(sliderFile(file))
     
+    avg_fastball = fastballAverage(file)
+    print("Fastball Averages:")
+    for key, value in avg_fastball.items():
+        print(f"{key}: {value}")
+
+    ScatterPlot(file)
     
 
 if __name__ == "__main__":
     main()
-
