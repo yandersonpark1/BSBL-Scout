@@ -8,10 +8,7 @@ def cleanData(file):
     df = df.drop(columns = ["No","Date","Pitch ID","Strike Zone Height","Spin Confidence","SSW VB","SSW HB","VB (spin)","HB (spin)","Horizontal Angle","Unique ID","Device Serial Number","SO - latLongConfidence","SO - latitude","SO - longitude","SO - rotMatConfidence","SO - timestamp","SO - Xx","SO - Xy","SO - Xz","SO - Yx","SO - Yy","SO - Yz","SO - Zx","SO - Zy","SO - Zz"])
     return df
 
-def pitcherProfile(self):
-    name = self.name
-    hand = self.hand  
-    
+
 
 #General Summary
 def importantValues(): 
@@ -237,6 +234,7 @@ def main():
     print("Fastball Averages:")
     for key, value in avg_fastball.items():
         print(f"{key}: {value}")
+    
     ScatterPlot(file)
     
 
