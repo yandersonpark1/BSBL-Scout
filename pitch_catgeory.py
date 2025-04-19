@@ -237,8 +237,6 @@ def main():
     print("Fastball Averages:")
     for key, value in avg_fastball.items():
         print(f"{key}: {value}")
-        print("hello world")
-        print("hello")
     ScatterPlot(file)
     
 

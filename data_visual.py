@@ -39,4 +39,3 @@ def ScatterPlot(file):
     )
     
     bsblPlot.show()
-    print("hello")
