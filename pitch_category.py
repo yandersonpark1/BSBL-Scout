@@ -6,21 +6,22 @@ from data_visual import ScatterPlot
 class pitch_category:
     def __init__(self, file): 
         self.file = file
+        self.df = None
     
     #Cleans data and sets to self.file for use in other functions
     def cleanData(self):
         df = pd.read_csv(self.file)
         df = df.drop(columns = ["No","Date","Pitch ID","Strike Zone Height","Spin Confidence","SSW VB","SSW HB","VB (spin)","HB (spin)","Horizontal Angle","Unique ID","Device Serial Number","SO - latLongConfidence","SO - latitude","SO - longitude","SO - rotMatConfidence","SO - timestamp","SO - Xx","SO - Xy","SO - Xz","SO - Yx","SO - Yy","SO - Yz","SO - Zx","SO - Zy","SO - Zz"])
-        self.file = df
-        return self.file
+        self.df = df
+        return self.df
 
 
     #Method to get Basic Values 
-    def importantValues(): 
+    def importantValues(self): 
         return ["Pitch Type","Velocity","VB (trajectory)", "HB (trajectory)"]
 
     #Method to help clean data; will remove any outliers from pitch data as to not skew results and give better averages 
-    def outliers(): 
+    def outliers(self): 
         pass
     
     #creates File for only fastball data for Rapsodo
@@ -160,13 +161,13 @@ class pitch_category:
                 else: 
                     fastball_type = "Ride-Run Fastball"
         
-            profile = f"{fastball_type} with a velocity of {vel} mph which is {fastball_velo}." 
+            profile = f"{fastball_type} with a velocity of {round(vel, 1)} mph which is {fastball_velo}." 
             return profile
     
         return {
-            "Velocity": fastball_avg_velo,
-            "VB": fastball_avg_VB,
-            "HB": fastball_avg_HB, 
+            "Velocity": round(fastball_avg_velo, 1),
+            "VB": round(fastball_avg_VB, 1),
+            "HB": round(fastball_avg_HB, 1), 
             "Profile": fastballClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB)
         }
     
@@ -226,10 +227,10 @@ def main():
     file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
     run_file = pitch_category(file)
     print((run_file.cleanData()))
-    print(run_file.fastballFile(file))
-    print(run_file.sliderFile(file))
+    print(run_file.fastballFile())
+    print(run_file.sliderFile())
     
-    avg_fastball = run_file.fastballAverage(file)
+    avg_fastball = run_file.fastballAverage()
     print("Fastball Averages:")
     for key, value in avg_fastball.items():
         print(f"{key}: {value}")
