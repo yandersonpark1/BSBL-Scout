@@ -220,8 +220,53 @@ class pitch_category:
         return df_sl[profile]
 
     #Changeup will need to use Deviations
-    def changeupType(file): 
-        pass
+    def changeupFile(self): 
+        CH_velo = ""
+        CH_type = ""
+        profile = ""
+    
+        #Reads file
+        df = pd.read_csv(self.file, usecols = self.importantValues())
+        df_CH = df.copy()
+    
+        #Cleans data and looks for fastballs
+        df_CH = df_CH[df_CH["Pitch Type"].str.contains("ChangeUp", na=False)]
+    
+        df_CH["Velocity"] = pd.to_numeric(df_CH["Velocity"], errors='coerce')
+        df_CH["VB (trajectory)"] = pd.to_numeric(df_CH["VB (trajectory)"], errors='coerce')
+        df_CH["HB (trajectory)"] = pd.to_numeric(df_CH["HB (trajectory)"], errors='coerce')
+        df_CH = df_CH.dropna()
+        
+        def ChangeUpClassifyFile(row):
+            vel = row["Velocity"]
+            hb = row["HB (trajectory)"]
+            vb = row["VB (trajectory)"]
+        
+            #Pitch-Velo Classification/ Need to classify velocity depending on FB
+        
+        
+            #Pitch type classification 
+            if abs(hb) <= 12:
+                CH_type = ("Bad CH") 
+            elif abs(hb) > 12 and abs(hb) <= 15:
+                CH_type = ("Average CH")
+            else: 
+                CH_type = "Great CH"
+            
+            #Pitch Type - VB Classification
+            if vb > 15: 
+                CH_type = "Bad CH"
+            elif vb < 15 and vb > 12:
+                CH_type = "Average CH"
+            else:
+                CH_type = "Great CH"
+        
+            profile = f"{CH_type} with a velocity of {vel} mph which is {CH_velo}." 
+            return profile
+    
+        #Applies classification to dataframe
+        df_CH[profile] = df_CH.apply(ChangeUpClassifyFile, axis=1)
+        return df_CH[profile]
 
 def main(): 
     file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
@@ -229,6 +274,7 @@ def main():
     print((run_file.cleanData()))
     print(run_file.fastballFile())
     print(run_file.sliderFile())
+    print(run_file.changeupFile())
     
     avg_fastball = run_file.fastballAverage()
     print("Fastball Averages:")

@@ -1,7 +1,4 @@
 
-"Player ID:",1269881
-"Player Name:",Matthew Ruttkay
-
 "No","Date","Pitch ID","Pitch Type","Is Strike","Strike Zone Side","Strike Zone Height","Velocity","Total Spin","True Spin (release)","Spin Efficiency (release)","Spin Direction","Spin Confidence","VB (trajectory)","HB (trajectory)","SSW VB","SSW HB","VB (spin)","HB (spin)","Horizontal Angle","Release Angle","Release Height","Release Side","Release Extension (ft)","Gyro Degree (deg)","Unique ID","Device Serial Number","SO - latLongConfidence","SO - latitude","SO - longitude","SO - rotMatConfidence","SO - timestamp","SO - Xx","SO - Xy","SO - Xz","SO - Yx","SO - Yy","SO - Yz","SO - Zx","SO - Zy","SO - Zz","Horizontal Approach Angle","Vertical Approach Angle"
 1,"Sun Feb 16 2025 6:30:10 PM",1739730610,"Fastball","Y","-8.63","32.54",80.72,1884,1634.7,86.8,"01:50",0.9,18.9,16.2,"-","-","10.6","15.2","-5.03","-1.08","5.57","2.53",2.0618877,"-29.81","1269881@1739730610","RBB21ZCUO45R",,,,,,,,,,,,,,,"-","-"
 2,"Sun Feb 16 2025 6:30:24 PM",1739730624,"Fastball","Y","5.90","23.75",82.23,1968.1,1700.3,86.4,"01:46",0.9,14.6,12.5,"-","-","10.9","14.3","-3.16","-1.74","5.61","2.30","-","-30.24","1269881@1739730624","RBB21ZCUO45R",,,,,,,,,,,,,,,"-","-"
