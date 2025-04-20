@@ -115,7 +115,7 @@ class pitch_category:
         fastball_avg_VB = df_fb["VB (trajectory)"].mean()
         fastball_avg_HB = df_fb["HB (trajectory)"].mean()
     
-        def fastballClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB):
+        def fastballAvgClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB):
             vel = fastball_avg_velo
             hb = fastball_avg_HB
             vb = fastball_avg_VB
@@ -168,7 +168,7 @@ class pitch_category:
             "Velocity": round(fastball_avg_velo, 1),
             "VB": round(fastball_avg_VB, 1),
             "HB": round(fastball_avg_HB, 1), 
-            "Profile": fastballClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB)
+            "Profile": fastballAvgClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB)
         }
     
     #creates File for only slider data for Rapsodo
@@ -267,6 +267,60 @@ class pitch_category:
         #Applies classification to dataframe
         df_CH[profile] = df_CH.apply(ChangeUpClassifyFile, axis=1)
         return df_CH[profile]
+    
+    def changeupAverage(self): 
+        CH_velo = ""
+        CH_type = ""
+        profile = ""
+    
+        #Reads file
+        df = pd.read_csv(self.file, usecols = self.importantValues())
+        df_ch = df.copy()
+    
+        #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
+        df_ch = df_ch[df_ch["Pitch Type"].str.contains("ChangeUp")]
+    
+        df_ch["Velocity"] = pd.to_numeric(df_ch["Velocity"], errors='coerce')
+        df_ch["VB (trajectory)"] = pd.to_numeric(df_ch["VB (trajectory)"], errors='coerce')
+        df_ch["HB (trajectory)"] = pd.to_numeric(df_ch["HB (trajectory)"], errors='coerce')
+        df_ch = df_ch.dropna()
+    
+        changeup_avg_velo = df_ch["Velocity"].mean()
+        changeup_avg_VB = df_ch["VB (trajectory)"].mean()
+        changeup_avg_HB = df_ch["HB (trajectory)"].mean()
+    
+        def changeupAvgClassify(changeup_avg_velo, changeup_avg_VB, changeup_avg_HB):
+            vel = changeup_avg_velo
+            hb = changeup_avg_HB
+            vb = changeup_avg_VB
+        
+            #Pitch-Velo Classification
+            #Pitch type classification 
+            if abs(hb) <= 12:
+                CH_type = ("Bad CH") 
+            elif abs(hb) > 12 and abs(hb) <= 15:
+                CH_type = ("Average CH")
+            else: 
+                CH_type = "Great CH"
+            
+            #Pitch Type - VB Classification
+            if vb > 15: 
+                CH_type = "Bad CH"
+            elif vb < 15 and vb > 12:
+                CH_type = "Average CH"
+            else:
+                CH_type = "Great CH"
+        
+            profile = f"{CH_type} with a velocity of {vel}." 
+            return profile
+    
+    
+        return {
+            "Velocity": round(changeup_avg_velo, 1),
+            "VB": round(changeup_avg_VB, 1),
+            "HB": round(changeup_avg_HB, 1), 
+            "Profile": changeupAvgClassify(changeup_avg_velo, changeup_avg_VB, changeup_avg_HB)
+        }
 
 def main(): 
     file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
@@ -276,11 +330,16 @@ def main():
     print(run_file.sliderFile())
     print(run_file.changeupFile())
     
+    
     avg_fastball = run_file.fastballAverage()
     print("Fastball Averages:")
     for key, value in avg_fastball.items():
         print(f"{key}: {value}")
     
+    avg_changeup = run_file.changeupAverage()
+    print("Changeup Averages:")
+    for key, value in avg_changeup.items():
+        print(f"{key}: {value}")
     ScatterPlot(file)
     
 
