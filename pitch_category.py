@@ -219,17 +219,48 @@ class pitch_category:
         df_sl[profile] = df_sl.apply(sliderClassifyFile, axis=1)
         return df_sl[profile]
 
-    #Changeup will need to use Deviations
+
+    #Changeup will need to use Deviations Based on Fastball
+    #creates File for only changeup data for Rapsodo#
+        #Changeup Profiles 
+            #Avg Deviations - Velo (8mph), VB (8 in), HB (3.5 in) 
+            #Velocity Deviation; <6: Firm, 6-9: Standard, > 9: Parachute 
+                #Firm and Standard GB; Parachute Whiffs
+            #VB Deviation; <= 5: Copycat, 5-10: Standard, > 10: Dropper
+                #Firm Droppers (GB)
+                #Parachute Dropper - Airbender 
+                    # Seam orientation typically around 2:30 or more 
+                #Typically with big VB deviations also comes high HB deviations
+            #HB Deviation; <6: Standard, >=6 Shuuto
+        #Notes 
+            #Typically Changeups with 4Seam FBs will grade Higher 
+            #Changeup with 2S/Sinkers FBs will grade lower
+            #Firm Copycats should be avoided
+            #Either two categories should be elite or one should be elite and the other should be standard
+            #BugsBunny Changeup: Changeup with >9 mph difference with standard and copycat mvmt (plays well)
+    
     def changeupFile(self): 
-        CH_velo = ""
-        CH_type = ""
-        profile = ""
+        #initialize variables
+        CH_velo, CH_VB, CH_HB = 0, 0, 0
+        CH_velo_profile, CH_VB_profile, CH_HB_profile = "", "", ""
+        CH_profile, profile = "", ""
+        
+        fastball_average = self.fastballAverage()
+        
+        #Sets variables to fastball average
+        for key, value in fastball_average.items():
+            if key == "Velocity":
+                CH_velo = value
+            elif key == "VB":
+                CH_VB = value
+            elif key == "HB":
+                CH_HB = value
     
         #Reads file
         df = pd.read_csv(self.file, usecols = self.importantValues())
         df_CH = df.copy()
     
-        #Cleans data and looks for fastballs
+        #Cleans data and looks for Changeups
         df_CH = df_CH[df_CH["Pitch Type"].str.contains("ChangeUp", na=False)]
     
         df_CH["Velocity"] = pd.to_numeric(df_CH["Velocity"], errors='coerce')
@@ -243,25 +274,32 @@ class pitch_category:
             vb = row["VB (trajectory)"]
         
             #Pitch-Velo Classification/ Need to classify velocity depending on FB
-        
-        
-            #Pitch type classification 
-            if abs(hb) <= 12:
-                CH_type = ("Bad CH") 
-            elif abs(hb) > 12 and abs(hb) <= 15:
-                CH_type = ("Average CH")
-            else: 
-                CH_type = "Great CH"
             
-            #Pitch Type - VB Classification
-            if vb > 15: 
-                CH_type = "Bad CH"
-            elif vb < 15 and vb > 12:
-                CH_type = "Average CH"
+            #CH Classification based on Velo 
+            if CH_velo - vel < 6:
+                CH_velo_profile = ("Firm")
+            elif CH_velo - vel >= 6 and CH_velo - vel <= 9:
+                CH_velo_profile = ("Standard")
+            elif CH_velo - vel > 9:
+                CH_velo_profile = ("Parachute")
+            
+            #CH classification based on HB
+            if CH_HB - abs(hb) < 6:
+                CH_HB_profile = ("Standard") 
+            else: 
+                CH_HB_profile = ("Shuuto")
+            
+            #CH Type - VB Classification
+            if CH_VB - vb <= 5: 
+                CH_VB_Profile = "CopyCat"
+            elif CH_VB - vb > 5 and CH_VB - vb <= 10:
+                CH_VB_Profile = "Standard"    
             else:
-                CH_type = "Great CH"
-        
-            profile = f"{CH_type} with a velocity of {vel} mph which is {CH_velo}." 
+                CH_VB_Profile = "Dropper"
+
+            CH_profile = CH_velo_profile + " " + CH_HB_profile + " " + CH_VB_Profile
+            
+            profile = f"{CH_profile} with a velocity of {vel} mph which is {CH_velo}." 
             return profile
     
         #Applies classification to dataframe
@@ -269,13 +307,26 @@ class pitch_category:
         return df_CH[profile]
     
     def changeupAverage(self): 
-        CH_velo = ""
-        CH_type = ""
-        profile = ""
+        #initialize variables
+        CH_velo, CH_VB, CH_HB = 0, 0, 0
+        CH_velo_profile, CH_VB_profile, CH_HB_profile = "", "", ""
+        CH_profile, profile = "", ""
     
+        fastball_average = self.fastballAverage()
+        
+        #Sets variables to fastball average
+        for key, value in fastball_average.items():
+            if key == "Velocity":
+                CH_velo = value
+            elif key == "VB":
+                CH_VB = value
+            elif key == "HB":
+                CH_HB = value
+                
         #Reads file
         df = pd.read_csv(self.file, usecols = self.importantValues())
         df_ch = df.copy()
+    
     
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
         df_ch = df_ch[df_ch["Pitch Type"].str.contains("ChangeUp")]
@@ -290,31 +341,38 @@ class pitch_category:
         changeup_avg_HB = df_ch["HB (trajectory)"].mean()
     
         def changeupAvgClassify(changeup_avg_velo, changeup_avg_VB, changeup_avg_HB):
-            vel = changeup_avg_velo
+            vel = round(changeup_avg_velo, 1)
             hb = changeup_avg_HB
             vb = changeup_avg_VB
         
             #Pitch-Velo Classification
-            #Pitch type classification 
-            if abs(hb) <= 12:
-                CH_type = ("Bad CH") 
-            elif abs(hb) > 12 and abs(hb) <= 15:
-                CH_type = ("Average CH")
-            else: 
-                CH_type = "Great CH"
+            if CH_velo - vel < 6:
+                CH_velo_profile = ("Firm")
+            elif CH_velo - vel >= 6 and CH_velo - vel <= 9:
+                CH_velo_profile = ("Standard")
+            elif CH_velo - vel > 9:
+                CH_velo_profile = ("Parachute")
             
-            #Pitch Type - VB Classification
-            if vb > 15: 
-                CH_type = "Bad CH"
-            elif vb < 15 and vb > 12:
-                CH_type = "Average CH"
+            #CH classification based on HB
+            if CH_HB - abs(hb) < 6:
+                CH_HB_profile = ("Standard") 
+            else: 
+                CH_HB_profile = ("Shuuto")
+            
+            #CH Type - VB Classification
+            if CH_VB - vb <= 5: 
+                CH_VB_Profile = "CopyCat"
+            elif CH_VB - vb > 5 and CH_VB - vb <= 10:
+                CH_VB_Profile = "Standard"    
             else:
-                CH_type = "Great CH"
-        
-            profile = f"{CH_type} with a velocity of {vel}." 
+                CH_VB_Profile = "Dropper"
+
+            CH_profile = CH_velo_profile + " " + CH_HB_profile + " " + CH_VB_Profile
+            
+            profile = f"{CH_profile} with a velocity of {vel}." 
             return profile
     
-    
+
         return {
             "Velocity": round(changeup_avg_velo, 1),
             "VB": round(changeup_avg_VB, 1),
@@ -325,22 +383,47 @@ class pitch_category:
 def main(): 
     file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
     run_file = pitch_category(file)
-    print((run_file.cleanData()))
-    print(run_file.fastballFile())
-    print(run_file.sliderFile())
-    print(run_file.changeupFile())
     
     
-    avg_fastball = run_file.fastballAverage()
-    print("Fastball Averages:")
-    for key, value in avg_fastball.items():
-        print(f"{key}: {value}")
-    
-    avg_changeup = run_file.changeupAverage()
-    print("Changeup Averages:")
-    for key, value in avg_changeup.items():
-        print(f"{key}: {value}")
-    ScatterPlot(file)
+    while True: 
+        print("\n 1. Run all the Pitches \n 2. Run Fastballs Only \n 3. Run Changeups Only \n 4. Run Sliders Only \n 5. Show me Fastball Average and Profile \n 6. Show me Changeup Avergae and Profile \n 7. Show me Pitch Visual. \n 8. Exit")
+        
+        option = input("Enter your choice: ")
+        
+        #Runs all Pitches 
+        if option == "1": 
+            print((run_file.cleanData()))
+        #Runs only Fastballs
+        elif option == "2": 
+            print(run_file.fastballFile())
+        #Runs only Changeups
+        elif option == "3": 
+            print(run_file.changeupFile())
+        #Runs only Sliders
+        elif option == "4": 
+            print(run_file.sliderFile())
+        #Runs Fastball Averages
+        elif option == "5": 
+            avg_fastball = run_file.fastballAverage()
+            print("Fastball Averages:")
+            for key, value in avg_fastball.items():
+                print(f"{key}: {value}")
+        #Runs Changeup Averages
+        elif option == "6":   
+            avg_changeup = run_file.changeupAverage()
+            print("Changeup Averages:")
+            for key, value in avg_changeup.items():
+                print(f"{key}: {value}")
+        #Runs Pitch Visual
+        elif option == "7":     
+            ScatterPlot(file)
+        #Exits
+        elif option == "8": 
+            print("Exiting the program.")
+            break
+        #Invalid option entered
+        else: 
+            print("Invalid option. Please try again.")
     
 
 if __name__ == "__main__":
