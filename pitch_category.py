@@ -24,6 +24,35 @@ class pitch_category:
     def outliers(self): 
         pass
     
+    
+    #Fastball Classifications
+    #Biggest Data Point for Fastballs is Release height 
+    #Limitations with Rapsodo Ability to Read Spin (purely movement and velocity based)
+    #Based on Primary Pitch Type (May need seperate file if different fastballs exist)
+    #Average Fastball Velo can be adjusted 
+    #Oberlin fastball avg velo - 84
+    #DeadZone Fastball - VB (11-14.5), |HB| (9-14.5)
+        #Need to adjust for release height
+        #Typically Need Elite Command or Elite Velocity
+        #Look for Spin Direction 1.20 - 1.40
+    #Inefficient Fastballs - VB < 11, |HB| (6-14.5)
+        #Neither Qualities of HB or VB 
+        #Typically need to be fixed with spin axis and direction 
+    #Riders - VB >= 15; 9HB - 14.5 |HB|
+        #Release Height (Needs Context) 
+        #Typically Higher Arm Slots
+        #High Vertical with Average Horionzontal
+    #Elite Sinkers - < 11 VB, >= 15.0 |HB|
+        #Release Height (typically lower arm slots; higher arm slots will play up)
+    #Running Fastball - VB 11-14.5; |HB| >= 15
+        #Usage plays as HB pitch 
+    #Riding Runners - VB >= 15; |HB| >= 15
+    #Gyro Fastballs - <11 VB; |HB| <= 5
+        #Think Very Hard Gyro Slider as Primary Pitch
+    #Standard Cutter - 11-14.5 VB; |HB| <= 5
+    #Riding Cutters - VB >=15; |HB| <= 5
+        #Combination of Cut and Ride
+        
     #creates File for only fastball data for Rapsodo
     def fastballFile(self): 
         fastball_velo = ""
@@ -49,43 +78,44 @@ class pitch_category:
             vb = row["VB (trajectory)"]
         
             #Pitch-Velo Classification
-            if vel < 79: 
-                fastball_velo = ("bad ")
-            elif vel >= 79 and vel <= 83:
-                fastball_velo = ("average")
-            elif vel >= 84 and vel <= 88: 
-                fastball_velo = ("great")
+            if vel < 84: 
+                fastball_velo = ("Below Average")
+            elif vel >= 84 and vel <= 86:
+                fastball_velo = ("Average")
             else: 
-                fastball_velo = ("elite")
+                fastball_velo = ("Elite")
         
             #Pitch type classification - (Cutters, Fastballs, Two-Seams)
             if abs(hb) <= 5:
                 fastball_type = ("Cutter") 
-            elif abs(hb) > 5 and abs(hb) <= 16:
-                fastball_type = ("Four-Seam")
-            else: 
-                fastball_type = "Two-Seam"
+            elif abs(hb) > 5 and abs(hb) <= 9:
+                fastball_type = ("Inefficient")
+            elif abs(hb) > 9 and abs(hb) < 15: 
+                fastball_type = "Four-Seam"
+            else:
+                fastball_type = ("Two-Seam")
+            
 
             #Pitch Type - VB Classification
-            if vb < 12: 
+            if vb < 11: 
                 if fastball_type == "Cutter": 
-                    fastball_type = "Cutter"
-                elif fastball_type == "Four-Seam":
-                    fastball_type = "Dead-Zone Fastball"
+                    fastball_type = "Gyro Fastball"
+                elif fastball_type == "Four-Seam" or fastball_type == "Inefficient":
+                    fastball_type = "Inefficient Fastball"
                 else: 
                     fastball_type = "Sinker"
-            elif vb >= 12 and vb <= 16:
+            elif vb >= 11 and vb <= 15:
                 if fastball_type == "Cutter": 
-                    fastball_type = "Cutter"
+                    fastball_type = "Standard Cutter"
                 elif fastball_type == "Four-Seam":
                     fastball_type = "Dead-Zone Fastball"
                 else: 
-                    fastball_type = "Two-Seam"
+                    fastball_type = "Runner"
             else: 
                 if fastball_type == "Cutter": 
-                    fastball_type = "Cut-Ride Fastball"
+                    fastball_type = "Riding-Cutters"
                 elif fastball_type == "Four-Seam":
-                    fastball_type = "Carry Fastball"
+                    fastball_type = "Riders"
                 else: 
                     fastball_type = "Ride-Run Fastball"
         
@@ -121,43 +151,44 @@ class pitch_category:
             vb = fastball_avg_VB
         
             #Pitch-Velo Classification
-            if vel < 79: 
-                fastball_velo = ("bad ")
-            elif vel >= 79 and vel <= 83:
-                fastball_velo = ("average")
-            elif vel >= 84 and vel <= 88: 
-                fastball_velo = ("great")
+            if vel < 84: 
+                fastball_velo = ("Below Average")
+            elif vel >= 84 and vel <= 86:
+                fastball_velo = ("Average")
             else: 
-                fastball_velo = ("elite")
+                fastball_velo = ("Elite")
         
             #Pitch type classification - (Cutters, Fastballs, Two-Seams)
             if abs(hb) <= 5:
                 fastball_type = ("Cutter") 
-            elif abs(hb) > 5 and abs(hb) <= 16:
-                fastball_type = ("Four-Seam")
-            else: 
-                fastball_type = "Two-Seam"
+            elif abs(hb) > 5 and abs(hb) <= 9:
+                fastball_type = ("Inefficient")
+            elif abs(hb) > 9 and abs(hb) < 15: 
+                fastball_type = "Four-Seam"
+            else:
+                fastball_type = ("Two-Seam")
             
+
             #Pitch Type - VB Classification
-            if vb < 12: 
+            if vb < 11: 
                 if fastball_type == "Cutter": 
-                    fastball_type = "Cutter"
-                elif fastball_type == "Four-Seam":
-                    fastball_type = "Dead-Zone Fastball"
+                    fastball_type = "Gyro Fastball"
+                elif fastball_type == "Four-Seam" or fastball_type == "Inefficient":
+                    fastball_type = "Inefficient Fastball"
                 else: 
                     fastball_type = "Sinker"
-            elif vb >= 12 and vb <= 16:
+            elif vb >= 11 and vb <= 15:
                 if fastball_type == "Cutter": 
-                    fastball_type = "Cutter"
+                    fastball_type = "Standard Cutter"
                 elif fastball_type == "Four-Seam":
                     fastball_type = "Dead-Zone Fastball"
                 else: 
-                    fastball_type = "Two-Seam"
+                    fastball_type = "Runner"
             else: 
                 if fastball_type == "Cutter": 
-                    fastball_type = "Cut-Ride Fastball"
+                    fastball_type = "Riding-Cutters"
                 elif fastball_type == "Four-Seam":
-                    fastball_type = "Carry Fastball"
+                    fastball_type = "Riders"
                 else: 
                     fastball_type = "Ride-Run Fastball"
         
