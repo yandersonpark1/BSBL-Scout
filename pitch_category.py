@@ -221,11 +221,12 @@ class pitch_category:
     
     #creates File for only slider data for Rapsodo
     def sliderFile(self): 
-        slider_velo = ""
-        slider_type = ""
+        slider_velo_profile = ""
+        slider_type_profile = ""
         profile = ""
 
         fastball_average = self.fastballAverage()
+        slider_velo = fastball_average["Velocity"]
         
         #Reads file
         df = pd.read_csv(self.file, usecols = self.importantValues())
@@ -243,24 +244,29 @@ class pitch_category:
             vel = row["Velocity"]
             hb = row["HB (trajectory)"]
             vb = row["VB (trajectory)"]
-        
-            #Pitch-Velo Classification/ Need to classify velocity depending on FB
-        
+
+            #Pitch Velocity depending on fastball
+            slider_velo = slider_velo - vel
         
             #Pitch type classification 
             if abs(hb) <= 5:
-                slider_type = ("Gyro") 
-            elif abs(hb) > 5 and abs(hb) <= 12:
+                slider_type = ("Cutter") 
+            elif abs(hb) > 5 and abs(hb) <= 11:
                 slider_type = ("Slider")
             else: 
                 slider_type = "Sweeper"
             
             #Pitch Type - VB Classification
-            if vb > -5: 
-                pass
-            elif vb < -5 or vb >-10:
-                if slider_type == "Slider": 
-                    slider_type = "Slurve"
+            if 7 > vb < 11: 
+                if slider_type == "Cutter": 
+                    slider_type = "Cutter"
+                elif slider_type == "Slider":
+                    slider_type = "Standard Slider"
+                else: 
+                    slider_type = "Sweeper"
+            elif vb <= 1 or vb > 7:
+                if slider_type == "Cutter": 
+                    slider_type = "Slutter"
         
             profile = f"{slider_type} with a velocity of {vel} mph which is {slider_velo}." 
             return profile
