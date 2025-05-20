@@ -42,7 +42,7 @@ class pitch_category:
         #Release Height (Needs Context) 
         #Typically Higher Arm Slots
         #High Vertical with Average Horionzontal
-    #Elite Sinkers - < 11 VB, >= 15.0 |HB|
+    #Sinkers - < 11 VB, >= 15.0 |HB|
         #Release Height (typically lower arm slots; higher arm slots will play up)
     #Running Fastball - VB 11-14.5; |HB| >= 15
         #Usage plays as HB pitch 
@@ -202,12 +202,31 @@ class pitch_category:
             "Profile": fastballAvgClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB)
         }
     
+    #Data Buckets for Sliders
+    #Cutter - (Velo (5-7 less than primary pitch)), VB (7-11), |HB| < 5
+        #Look to Throw Hardest Slider
+        #Needs to be Firm with Command 
+    #Slutter - (Velo (Typically 6-8 ticks less than primary pitch)), VB (1-7), |HB| < 5
+       #Typically More Gyro Spin than Cutter` 
+       #Typically still behind the ball
+    #Gyro Slider - Velo (Typically 9-11 off primary pitch), VB (-2, 2), |HB| < 5
+        #Smallest Movement Profile 
+    #Standard Slider - Velo (Typically 9-11 off primary pitch), VB (-2,5), 11 > |HB| > 5
+        #Increase Side Spin 
+        #Very Similar to Gyro But adds mini Sweep Component
+    #Sweeper - Velo (Typically 11-14 off primary pitch), VB (-2,5), |HB| > 11
+        #Higher Spin Rates
+    #Slurve - Velo (Typically 11-14 off primary pitch), VB < -3, |HB| > 11
+        #Slurves typically are Sweepers with More depth killing Horizontal 
+    
     #creates File for only slider data for Rapsodo
     def sliderFile(self): 
         slider_velo = ""
         slider_type = ""
         profile = ""
-    
+
+        fastball_average = self.fastballAverage()
+        
         #Reads file
         df = pd.read_csv(self.file, usecols = self.importantValues())
         df_sl = df.copy()
