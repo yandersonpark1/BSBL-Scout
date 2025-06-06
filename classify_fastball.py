@@ -31,101 +31,100 @@ from data_visual import ScatterPlot
         #Combination of Cut and Ride
         
     #Class creates Object with Classified Fastball
-    class ClassifyFastball:
+class ClassifyFastball:    
+    """Initializes the ClassifyFastball class with a file, dataframe, fastball velocity, fastball type, and profile."""
+    """Needs file to read data from, and will classify fastballs based on velocity and trajectory."""
+    def __init__(self, file):
+        self.file = file
+        self.fastball_velo = ""
+        self.fastball_type = ""
+        self.profile = ""
+        self.df = None
+        self.importantValues = ["Pitch Type","Velocity","VB (trajectory)", "HB (trajectory)"]
+    
+    """Helper function to clean the dataframe and select important columns."""
+    def fastballPitch(self): 
+        #Reads file
+        self.df = pd.read_csv(self.file, usecols = self.importantValues())
         
-        """Initializes the ClassifyFastball class with a file, dataframe, fastball velocity, fastball type, and profile."""
-        def __init__(self, file, df, fastball_velo, fastball_type, profile):
-            self.file = file
-            self.fastball_velo = 0 
-            self.fastball_type = ""
-            self.profile = ""
-    
-        def fastballFile(self): 
-            #Reads file
-            self.df = pd.read_csv(self.file, usecols = self.importantValues())
-            df_fb = self.df.copy()
-    
-            #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
-            df_fb = df_fb[df_fb["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
+        #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
+        self.df = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
 
-            df_fb["Velocity"] = pd.to_numeric(df_fb["Velocity"], errors='coerce')
-            df_fb["VB (trajectory)"] = pd.to_numeric(df_fb["VB (trajectory)"], errors='coerce')
-            df_fb["HB (trajectory)"] = pd.to_numeric(df_fb["HB (trajectory)"], errors='coerce')
-            df_fb = df_fb.dropna()
-    
-    #Filters through grading fastball
-        def fastballClassifyFile(row):
+        self.df["Velocity"] = pd.to_numeric(self.df["Velocity"], errors='coerce')
+        self.df["VB (trajectory)"] = pd.to_numeric(self.df["VB (trajectory)"], errors='coerce')
+        self.df["HB (trajectory)"] = pd.to_numeric(self.df["HB (trajectory)"], errors='coerce')
+        self.df = self.df_fb.dropna()
+
+        #Filters through grading fastball
+        def ClassifyFastballPitch(row):
             vel = row["Velocity"]
             hb = row["HB (trajectory)"]
             vb = row["VB (trajectory)"]
         
             #Pitch-Velo Classification
             if vel < 84: 
-                fastball_velo = ("Below Average")
+                self.fastball_velo = ("Below Average")
             elif vel >= 84 and vel <= 86:
-                fastball_velo = ("Average")
+                self.fastball_velo = ("Average")
             else: 
-                fastball_velo = ("Elite")
+                self.fastball_velo = ("Elite")
         
             #Pitch type classification - (Cutters, Fastballs, Two-Seams)
             if abs(hb) <= 5:
-                fastball_type = ("Cutter") 
+                self.fastball_type = ("Cutter") 
             elif abs(hb) > 5 and abs(hb) <= 9:
-                fastball_type = ("Inefficient")
+                self.fastball_type = ("Inefficient")
             elif abs(hb) > 9 and abs(hb) < 15: 
-                fastball_type = "Four-Seam"
+                self.fastball_type = "Four-Seam"
             else:
-                fastball_type = ("Two-Seam")
+                self.fastball_type = ("Two-Seam")
             
 
             #Pitch Type - VB Classification
             if vb < 11: 
-                if fastball_type == "Cutter": 
-                    fastball_type = "Gyro Fastball"
-                elif fastball_type == "Four-Seam" or fastball_type == "Inefficient":
-                    fastball_type = "Inefficient Fastball"
+                if self.fastball_type == "Cutter": 
+                    self.fastball_type = "Gyro Fastball"
+                elif self.fastball_type == "Four-Seam" or self.fastball_type == "Inefficient":
+                    self.fastball_type = "Inefficient Fastball"
                 else: 
-                    fastball_type = "Sinker"
+                    self.fastball_type = "Sinker"
             elif vb >= 11 and vb <= 15:
-                if fastball_type == "Cutter": 
-                    fastball_type = "Standard Cutter"
-                elif fastball_type == "Four-Seam":
-                    fastball_type = "Dead-Zone Fastball"
+                if self.fastball_type == "Cutter": 
+                    self.fastball_type = "Standard Cutter"
+                elif self.fastball_type == "Four-Seam":
+                    self.fastball_type = "Dead-Zone Fastball"
                 else: 
-                    fastball_type = "Runner"
+                    self.fastball_type = "Runner"
             else: 
-                if fastball_type == "Cutter": 
-                    fastball_type = "Riding-Cutters"
-                elif fastball_type == "Four-Seam":
-                    fastball_type = "Riders"
+                if self.fastball_type == "Cutter": 
+                    self.fastball_type = "Riding-Cutters"
+                elif self.fastball_type == "Four-Seam":
+                    self.fastball_type = "Riders"
                 else: 
-                    fastball_type = "Ride-Run Fastball"
+                    self.fastball_type = "Ride-Run Fastball"
         
-            profile = f"{fastball_type} with a velocity of {vel} mph which is {fastball_velo}." 
-            return profile
+            self.profile = f"{self.fastball_type} with a velocity of {vel} mph which is {self.fastball_velo}." 
+            return self.profile
     
         #Applies classification to dataframe
-        df_fb[profile] = df_fb.apply(fastballClassifyFile, axis=1)
-        return df_fb[profile]
+        self.df[self.profile] = self.df.apply(ClassifyFastballPitch, axis=1)
+        return self.df[self.profile]
 
     def fastballAverage(self): 
-        profile = ""
-    
         #Reads file
-        df = pd.read_csv(self.file, usecols = self.importantValues())
-        df_fb = df.copy()
+        self.df = pd.read_csv(self.file, usecols = self.importantValues())
     
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
-        df_fb = df_fb[df_fb["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
+        self.df = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
     
-        df_fb["Velocity"] = pd.to_numeric(df_fb["Velocity"], errors='coerce')
-        df_fb["VB (trajectory)"] = pd.to_numeric(df_fb["VB (trajectory)"], errors='coerce')
-        df_fb["HB (trajectory)"] = pd.to_numeric(df_fb["HB (trajectory)"], errors='coerce')
-        df_fb = df_fb.dropna()
+        self.df["Velocity"] = pd.to_numeric(self.df["Velocity"], errors='coerce')
+        self.df["VB (trajectory)"] = pd.to_numeric(self.df["VB (trajectory)"], errors='coerce')
+        self.df["HB (trajectory)"] = pd.to_numeric(self.df["HB (trajectory)"], errors='coerce')
+        self.df = self.df.dropna()
     
-        fastball_avg_velo = df_fb["Velocity"].mean()
-        fastball_avg_VB = df_fb["VB (trajectory)"].mean()
-        fastball_avg_HB = df_fb["HB (trajectory)"].mean()
+        fastball_avg_velo = self.df["Velocity"].mean()
+        fastball_avg_VB = self.df["VB (trajectory)"].mean()
+        fastball_avg_HB = self.df["HB (trajectory)"].mean()
     
         def fastballAvgClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB):
             vel = fastball_avg_velo
@@ -134,47 +133,47 @@ from data_visual import ScatterPlot
         
             #Pitch-Velo Classification
             if vel < 84: 
-                fastball_velo = ("Below Average")
+                self.fastball_velo = ("Below Average")
             elif vel >= 84 and vel <= 86:
-                fastball_velo = ("Average")
+                self.fastball_velo = ("Average")
             else: 
-                fastball_velo = ("Elite")
+                self.fastball_velo = ("Elite")
         
             #Pitch type classification - (Cutters, Fastballs, Two-Seams)
             if abs(hb) <= 5:
-                fastball_type = ("Cutter") 
+                self.fastball_type = ("Cutter") 
             elif abs(hb) > 5 and abs(hb) <= 9:
-                fastball_type = ("Inefficient")
+                self.fastball_type = ("Inefficient")
             elif abs(hb) > 9 and abs(hb) < 15: 
-                fastball_type = "Four-Seam"
+                self.fastball_type = "Four-Seam"
             else:
-                fastball_type = ("Two-Seam")
+                self.fastball_type = ("Two-Seam")
             
 
             #Pitch Type - VB Classification
             if vb < 11: 
-                if fastball_type == "Cutter": 
-                    fastball_type = "Gyro Fastball"
-                elif fastball_type == "Four-Seam" or fastball_type == "Inefficient":
-                    fastball_type = "Inefficient Fastball"
+                if self.fastball_type == "Cutter": 
+                    self.fastball_type = "Gyro Fastball"
+                elif self.fastball_type == "Four-Seam" or self.fastball_type == "Inefficient":
+                    self.fastball_type = "Inefficient Fastball"
                 else: 
-                    fastball_type = "Sinker"
+                    self.fastball_type = "Sinker"
             elif vb >= 11 and vb <= 15:
-                if fastball_type == "Cutter": 
-                    fastball_type = "Standard Cutter"
-                elif fastball_type == "Four-Seam":
-                    fastball_type = "Dead-Zone Fastball"
+                if self.fastball_type == "Cutter": 
+                    self.fastball_type = "Standard Cutter"
+                elif self.fastball_type == "Four-Seam":
+                    self.fastball_type = "Dead-Zone Fastball"
                 else: 
-                    fastball_type = "Runner"
+                    self.fastball_type = "Runner"
             else: 
-                if fastball_type == "Cutter": 
-                    fastball_type = "Riding-Cutters"
-                elif fastball_type == "Four-Seam":
-                    fastball_type = "Riders"
+                if self.fastball_type == "Cutter": 
+                    self.fastball_type = "Riding-Cutters"
+                elif self.fastball_type == "Four-Seam":
+                    self.fastball_type = "Riders"
                 else: 
-                    fastball_type = "Ride-Run Fastball"
+                    self.fastball_type = "Ride-Run Fastball"
         
-            profile = f"{fastball_type} with a velocity of {round(vel, 1)} mph which is {fastball_velo}." 
+            profile = f"{self.fastball_type} with a velocity of {round(vel, 1)} mph which is {self.fastball_velo}." 
             return profile
     
         return {
