@@ -21,4 +21,7 @@ from data_visual import ScatterPlot
             #Firm Copycats should be avoided
             #Either two categories should be elite or one should be elite and the other should be standard
             #BugsBunny Changeup: Changeup with >9 mph difference with standard and copycat mvmt (plays well)
-    
+
+class ClassifyChangeup:
+    def __init__(self):
+        pass
