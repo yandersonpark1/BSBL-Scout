@@ -35,32 +35,30 @@ class ClassifyFastball:
     """Initializes the ClassifyFastball class with a file, dataframe, fastball velocity, fastball type, and profile."""
     """Needs file to read data from, and will classify fastballs based on velocity and trajectory."""
     def __init__(self, file):
-        self.file = file
+        #Reads file
+        self.df = pd.read_csv(file)
+        
+        #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
+        self.df_fb = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
+        self.df_fb = self.df_fb.dropna()
+       
+        #numerizes values
+        self.df_fb["Velocity"] = pd.to_numeric(self.df_fb["Velocity"], errors='coerce')
+        self.df_fb["VB (trajectory)"] = pd.to_numeric(self.df_fb["VB (trajectory)"], errors='coerce')
+        self.df_fb["HB (trajectory)"] = pd.to_numeric(self.df_fb["HB (trajectory)"], errors='coerce')
+        self.df_fb = self.df_fb.dropna()
+        
+        # Fastball attributes
         self.fastball_velo = ""
         self.fastball_type = ""
         self.profile = ""
-        self.df = None
-        self.importantValues = ["Pitch Type","Velocity","VB (trajectory)", "HB (trajectory)"]
     
-    """Helper function to clean the dataframe and select important columns."""
-    def fastballPitch(self): 
-        #Reads file
-        self.df = pd.read_csv(self.file, usecols = self.importantValues())
-        
-        #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
-        self.df = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
-
-        self.df["Velocity"] = pd.to_numeric(self.df["Velocity"], errors='coerce')
-        self.df["VB (trajectory)"] = pd.to_numeric(self.df["VB (trajectory)"], errors='coerce')
-        self.df["HB (trajectory)"] = pd.to_numeric(self.df["HB (trajectory)"], errors='coerce')
-        self.df = self.df_fb.dropna()
-
+    def fastballPitch(self):
         #Filters through grading fastball
         def ClassifyFastballPitch(row):
             vel = row["Velocity"]
             hb = row["HB (trajectory)"]
             vb = row["VB (trajectory)"]
-        
             #Pitch-Velo Classification
             if vel < 84: 
                 self.fastball_velo = ("Below Average")
@@ -105,26 +103,15 @@ class ClassifyFastball:
         
             self.profile = f"{self.fastball_type} with a velocity of {vel} mph which is {self.fastball_velo}." 
             return self.profile
+        #Classifies each fastball in the dataframe
+        self.df_fb["Profile"] = self.df_fb.apply(ClassifyFastballPitch, axis=1)
+        return self.df_fb["Profile"]
     
-        #Applies classification to dataframe
-        self.df[self.profile] = self.df.apply(ClassifyFastballPitch, axis=1)
-        return self.df[self.profile]
 
     def fastballAverage(self): 
-        #Reads file
-        self.df = pd.read_csv(self.file, usecols = self.importantValues())
-    
-        #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
-        self.df = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
-    
-        self.df["Velocity"] = pd.to_numeric(self.df["Velocity"], errors='coerce')
-        self.df["VB (trajectory)"] = pd.to_numeric(self.df["VB (trajectory)"], errors='coerce')
-        self.df["HB (trajectory)"] = pd.to_numeric(self.df["HB (trajectory)"], errors='coerce')
-        self.df = self.df.dropna()
-    
-        fastball_avg_velo = self.df["Velocity"].mean()
-        fastball_avg_VB = self.df["VB (trajectory)"].mean()
-        fastball_avg_HB = self.df["HB (trajectory)"].mean()
+        fastball_avg_velo = self.df_fb["Velocity"].mean()
+        fastball_avg_VB = self.df_fb["VB (trajectory)"].mean()
+        fastball_avg_HB = self.df_fb["HB (trajectory)"].mean()
     
         def fastballAvgClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB):
             vel = fastball_avg_velo
@@ -182,3 +169,20 @@ class ClassifyFastball:
             "HB": round(fastball_avg_HB, 1), 
             "Profile": fastballAvgClassify(fastball_avg_velo, fastball_avg_VB, fastball_avg_HB)
         }
+
+
+def main(): 
+    file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
+    run_filename = ClassifyFastball(file)
+    
+    #Run Indiviudal Pitches
+    print(run_filename.fastballPitch())
+    
+    #Run average fastball
+    avg_fastball = run_filename.fastballAverage()
+    print("Fastball Averages:")
+    for key, value in avg_fastball.items():
+        print(f"{key}: {value}")
+    
+if __name__ == "__main__":
+    main()
