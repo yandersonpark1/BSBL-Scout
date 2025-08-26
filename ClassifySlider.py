@@ -1,11 +1,17 @@
 import pandas as pd 
 import plotly.express as px
 from data_visual import ScatterPlot    
+import sys 
 
 class ClassifySlider:
-    def __init__(self, file):
+    def __init__(self, file_or_df):
         #Reads file
-        self.df = pd.read_csv(file)
+        if isinstance(file_or_df, str):
+            self.df = pd.read_csv(file_or_df)
+        elif isinstance(file_or_df, pd.DataFrame):
+            self.df = file_or_df
+        else:
+            raise ValueError("Input must be a file path or pandas DataFrame.")
         
         """Data for Fastball average to compare changeups"""
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
@@ -88,9 +94,22 @@ class ClassifySlider:
         self.df_sl["Profile"] = self.df_sl.apply(sliderClassifyFile, axis=1)
         return self.df_sl["Profile"]
 
-def main(): 
-    file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
-    run_filename = ClassifySlider(file)
+def main(file): 
+    """Checks for correct input type"""
+    if isinstance(file, str):
+        df = pd.read_csv(file)
+    elif isinstance(file, pd.DataFrame):
+        df = file
+    else:
+        print("Invalid input. Exiting.")
+        sys.exit(1)
+
+    if df.empty:
+        print("No data found. Exiting.")
+        return None
+    
+    """Run Slider Classification"""
+    run_filename = ClassifySlider(df)
     
     #Run Indiviudal Pitches
     print(run_filename.sliderFile())

@@ -1,6 +1,7 @@
 import pandas as pd 
 import plotly.express as px
 from data_visual import ScatterPlot
+import sys
 
 
 #Changeup will need to use Deviations Based on Fastball
@@ -23,9 +24,14 @@ from data_visual import ScatterPlot
             #BugsBunny Changeup: Changeup with >9 mph difference with standard and copycat mvmt (plays well)
 
 class ClassifyChangeup:
-    def __init__(self, file):
+    def __init__(self, file_or_df):
         #Reads file
-        self.df = pd.read_csv(file)
+        if isinstance(file_or_df, str):
+            self.df = pd.read_csv(file_or_df)
+        elif isinstance(file_or_df, pd.DataFrame):
+            self.df = file_or_df
+        else:
+            raise ValueError("Input must be a file path or pandas DataFrame.")
         
         """Data for Fastball average to compare changeups"""
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
@@ -140,9 +146,22 @@ class ClassifyChangeup:
             "Profile": changeupAvgClassify(changeup_avg_velo, changeup_avg_VB, changeup_avg_HB)
         }
 
-def main(): 
-    file = input ("Enter the file name (with .csv extension): ")  
-    run_filename = ClassifyChangeup(file)
+def main(file = None): 
+    """Checks for correct input type"""
+    if isinstance(file, str):
+        df = pd.read_csv(file)
+    elif isinstance(file, pd.DataFrame):
+        df = file
+    else:
+        print("Invalid input. Exiting.")
+        sys.exit(1)
+
+    if df.empty:
+        print("No data found. Exiting.")
+        return None 
+    
+    """Runs Changeup Classifier"""
+    run_filename = ClassifyChangeup(df)
     
     """Individual Changeup Pitches"""
     print(run_filename.changeupFile())

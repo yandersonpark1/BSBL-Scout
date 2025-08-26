@@ -1,6 +1,7 @@
 import pandas as pd 
 import plotly.express as px
 from data_visual import ScatterPlot
+import sys
 
 #Fastball Classifications
     #Biggest Data Point for Fastballs is Release height 
@@ -34,9 +35,14 @@ from data_visual import ScatterPlot
 class ClassifyFastball:    
     """Initializes the ClassifyFastball class with a file, dataframe, fastball velocity, fastball type, and profile."""
     """Needs file to read data from, and will classify fastballs based on velocity and trajectory."""
-    def __init__(self, file):
+    def __init__(self, file_or_df):
         #Reads file
-        self.df = pd.read_csv(file)
+        if isinstance(file_or_df, str):
+            self.df = pd.read_csv(file_or_df)
+        elif isinstance(file_or_df, pd.DataFrame):
+            self.df = file_or_df
+        else:
+            raise ValueError("Input must be a file path or pandas DataFrame.")
         
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
         self.df_fb = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
@@ -171,9 +177,22 @@ class ClassifyFastball:
         }
 
 
-def main(): 
-    file = input ("Enter the file name (with .csv extension): ")  # change this if the file is named differently
-    run_filename = ClassifyFastball(file)
+def main(file): 
+    """Checks for correct input type"""
+    if isinstance(file, str):
+        df = pd.read_csv(file)
+    elif isinstance(file, pd.DataFrame):
+        df = file
+    else:
+        print("Invalid input. Exiting.")
+        sys.exit(1)
+
+    if df.empty:
+        print("No data found. Exiting.")
+        return None
+    
+    """runs fastball classification"""
+    run_filename = ClassifyFastball(df)
     
     #Run Indiviudal Pitches
     print(run_filename.fastballPitch())
