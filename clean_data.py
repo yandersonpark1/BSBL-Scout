@@ -10,7 +10,7 @@ def load_rapsodo_csv(file_path):
     with open(file_path, "r", encoding="utf-8") as f:
         first_line = f.readline().strip()
     
-    if first_line.startswith("No,Pitch Type"):
+    if first_line.startswith("Date,No,Pitch Type"):
         print(f"File already cleaned: {file_path}")
         return pd.read_csv(file_path)
     
@@ -21,11 +21,11 @@ def load_rapsodo_csv(file_path):
 
     player_id = player_id_line[1].replace('"', '')
     player_name = player_name_line[1].replace('"', '').replace(" ", "_")
-
+    
     df = pd.read_csv(file_path, skiprows=2)
 
     keep_cols = [
-        "No","Pitch Type","Is Strike","Velocity","Total Spin",
+        "Date","No","Pitch Type","Is Strike","Velocity","Total Spin",
         "Spin Efficiency (release)","Spin Direction",
         "VB (trajectory)","HB (trajectory)",
         "Release Height","Release Side"
@@ -34,6 +34,9 @@ def load_rapsodo_csv(file_path):
     df["Player ID"] = player_id
     df["Player Name"] = player_name
 
+    # Convert Date column to MM/DD/YYYY
+    df["Date"] = pd.to_datetime(df["Date"], errors="coerce").dt.strftime("%m/%d/%Y")
+    
     # Overwrite the original file
     df.to_csv(file_path, index=False)
     print(f"Filtered CSV saved (overwritten): {file_path}")

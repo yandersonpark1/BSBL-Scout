@@ -1,4 +1,5 @@
 from pymongo.mongo_client import MongoClient
+from pymongo.server_api import ServerApi
 import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
@@ -9,7 +10,7 @@ load_dotenv()
 uri = os.getenv("uri")
 
 # Create a new client and connect to the server
-client = MongoClient(uri)
+client = MongoClient(uri, server_api=ServerApi('1'))
 
 #choose your database
 db = client["Oberlin_staff"]
