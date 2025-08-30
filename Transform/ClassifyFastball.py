@@ -45,7 +45,7 @@ class ClassifyFastball:
             raise ValueError("Input must be a file path or pandas DataFrame.")
         
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
-        self.df_fb = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
+        self.df_fb = self.df[self.df["Pitch Type"].str.contains("Fastball|TwoSeamFastball|Cutter", case = False, na=False, regex = True)]
         self.df_fb = self.df_fb.dropna()
        
         #numerizes values
@@ -95,12 +95,14 @@ class ClassifyFastball:
             elif vb >= 11 and vb <= 15:
                 if self.fastball_type == "Cutter": 
                     self.fastball_type = "Standard Cutter"
+                elif self.fastball_type == "Inefficient":
+                    self.fastball_type = "Inefficient Fastball"
                 elif self.fastball_type == "Four-Seam":
                     self.fastball_type = "Dead-Zone Fastball"
                 else: 
                     self.fastball_type = "Runner"
             else: 
-                if self.fastball_type == "Cutter": 
+                if self.fastball_type == "Cutter" or self.fastball_type == "Inefficient": 
                     self.fastball_type = "Riding-Cutters"
                 elif self.fastball_type == "Four-Seam":
                     self.fastball_type = "Riders"

@@ -1,7 +1,7 @@
-from clean_data import main as clean_data 
-from ClassifyFastball import main as run_fastball
-from ClassifyChangeup import main as run_changeup
-from ClassifySlider import main as run_slider
+from Transform.clean_data import main as clean_data 
+from Transform.ClassifyFastball import main as run_fastball
+from Transform.ClassifyChangeup import main as run_changeup
+from Transform.ClassifySlider import main as run_slider
 
 def pipeline(folder_path = None, player_name = None): 
     print("Starting data cleaning...")
