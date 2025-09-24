@@ -15,7 +15,7 @@ class ClassifySlider:
         
         """Data for Fastball average to compare changeups"""
         #Cleans data and looks for fastballs (Need to Change 2S, CT to exact value)
-        self.df_fb = self.df[self.df["Pitch Type"].str.contains("Fastball|2S|Ct", case = False, na=False, regex = True)]
+        self.df_fb = self.df[self.df["Pitch Type"].str.contains("Fastball", case = False, na=False, regex = True)]
         self.df_fb = self.df_fb.dropna()
         
         #numerizes values
@@ -31,7 +31,7 @@ class ClassifySlider:
         self.slider_type_profile = ""
         self.profile = ""
         
-        self.df_sl = self.df[self.df["Pitch Type"].str.contains("Slider", na=False)].copy()
+        self.df_sl = self.df[self.df["Pitch Type"].str.contains("Slider|Curveball|Cutter", na=False)].copy()
     
         self.df_sl["Velocity"] = pd.to_numeric(self.df_sl["Velocity"], errors='coerce')
         self.df_sl["VB (trajectory)"] = pd.to_numeric(self.df_sl["VB (trajectory)"], errors='coerce')
@@ -66,28 +66,41 @@ class ClassifySlider:
 
             #Pitch Velocity depending on fastball
             slider_velo = self.fastball_velo - vel
-        
+
             #Pitch type classification 
-            if abs(hb) <= 5:
+            if abs(hb) <= 4:
                 slider_type = ("Cutter") 
-            elif abs(hb) > 5 and abs(hb) <= 11:
+            elif 4 < abs(hb) <= 12:
                 slider_type = ("Slider")
             else: 
                 slider_type = "Sweeper"
             
             #Pitch Type - VB Classification
-            if 7 <= vb <= 11: 
-                if slider_type == "Cutter": 
+            if slider_type == "Cutter": 
+                if 5 <= vb <= 10: 
                     slider_type = "Cutter"
-                elif slider_type == "Slider":
-                    slider_type = "Standard Slider"
-                else: 
-                    slider_type = "Sweeper"
-            elif 1 >= vb > 7:
-                if slider_type == "Cutter": 
+                elif 3 <= vb < 5:
                     slider_type = "Slutter"
+                elif -6 <= vb < 3:
+                    slider_type = "Gyro Slider"
+                else: 
+                    slider_type = "Curveball"
+            elif slider_type == "Slider":
+                if -6 <= vb <= 6:
+                    slider_type = "Standard Slider"
+                elif vb > 6: 
+                    slider_type = "Error"
+                else: 
+                    slider_type = "Slurve"
+            elif slider_type == "Sweeper": 
+                if vb > 5: 
+                    slider_type = "Error"
+                elif -6 <= vb <= 5: 
+                    slider_type = "Sweeper"
+                else: 
+                    slider_type = "Slurve"
         
-            profile = f"{slider_type} with a velocity of {vel} mph which is {slider_velo}." 
+            profile = f"{slider_type} with a velocity of {vel} mph which is a difference of {slider_velo}." 
             return profile
     
         #Applies classification to dataframe

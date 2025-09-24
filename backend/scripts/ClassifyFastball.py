@@ -78,7 +78,7 @@ class ClassifyFastball:
                 self.fastball_type = ("Cutter") 
             elif abs(hb) > 5 and abs(hb) <= 9:
                 self.fastball_type = ("Inefficient")
-            elif abs(hb) > 9 and abs(hb) < 15: 
+            elif abs(hb) > 9 and abs(hb) < 18: 
                 self.fastball_type = "Four-Seam"
             else:
                 self.fastball_type = ("Two-Seam")
@@ -92,19 +92,19 @@ class ClassifyFastball:
                     self.fastball_type = "Inefficient Fastball"
                 else: 
                     self.fastball_type = "Sinker"
-            elif vb >= 11 and vb <= 15:
+            elif vb >= 11 and vb <= 18:
                 if self.fastball_type == "Cutter": 
                     self.fastball_type = "Standard Cutter"
                 elif self.fastball_type == "Inefficient":
-                    self.fastball_type = "Inefficient Fastball"
+                    self.fastball_type = "Dead-Zone Fastball"
                 elif self.fastball_type == "Four-Seam":
                     self.fastball_type = "Dead-Zone Fastball"
                 else: 
                     self.fastball_type = "Runner"
             else: 
-                if self.fastball_type == "Cutter" or self.fastball_type == "Inefficient": 
+                if self.fastball_type == "Cutter": 
                     self.fastball_type = "Riding-Cutters"
-                elif self.fastball_type == "Four-Seam":
+                elif self.fastball_type == "Four-Seam" or self.fastball_type == "Inefficient":
                     self.fastball_type = "Riders"
                 else: 
                     self.fastball_type = "Ride-Run Fastball"
