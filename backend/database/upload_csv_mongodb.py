@@ -1,4 +1,4 @@
-from db_connect import db
+from database.db_connect import db
 import pandas as pd
 from collections import defaultdict
 import os
