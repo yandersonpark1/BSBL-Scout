@@ -2,8 +2,20 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from database.db_connect import db
 from scripts.pipeline import pipeline
+#for testing locally
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
+
+#for testing locally
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all methods
+    allow_headers=["*"],  # Allows all headers
+)
 
 @app.post("/upload")
 async def upload_file(file: UploadFile = File(...)): 
