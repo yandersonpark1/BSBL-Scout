@@ -1,3 +1,4 @@
+"""Backend connecting to Database for Oberlin Pitching Staff"""
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
