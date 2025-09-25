@@ -22,6 +22,7 @@ function UploadForm() {
     const formData = new FormData();
     formData.append("file", file);
 
+    //client requesting API endpoint to server
     try {
       const response = await fetch("http://localhost:8000/upload", {
         method: "POST",
