@@ -5,7 +5,7 @@ from scripts.pipeline import pipeline
 
 app = FastAPI()
 
-@app.post("/uploadfile/")
+@app.post("/upload")
 async def upload_file(file: UploadFile = File(...)): 
     #Ensuring the uploaded file is a CSV
     if not file.filename.endswith('.csv'):
