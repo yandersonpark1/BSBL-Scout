@@ -1,7 +1,7 @@
 #Entry point for FastAPI application
 from fastapi import FastAPI, UploadFile, File, HTTPException
-from database.db_connect import db
-from scripts.pipeline import pipeline
+from backend.database.db_connect import collection
+# from backend.scripts.pipeline import pipeline
 #for testing locally
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -30,7 +30,7 @@ async def upload_file(file: UploadFile = File(...)):
     # results = pipeline(file_contents, file.filename)
     
     # Save raw data and results to database
-    db.insert_one({"filename": file.filename, "results": file_contents})
+    collection.insert_one({"filename": file.filename, "results": file_contents})
     
     #User Response 
-    return {"message": "File uploaded succesffully", "results": results}
+    return {"message": "File uploaded succesffully"}

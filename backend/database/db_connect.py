@@ -15,6 +15,7 @@ client = MongoClient(uri, server_api=ServerApi('1'))
 
 #choose your database
 db = client["Oberlin_staff"]
+collection = db["players"]
 
 # Send a ping to confirm a successful connection
 try:
