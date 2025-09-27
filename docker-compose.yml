@@ -1,6 +1,18 @@
 version: '3.8'
 
 services: 
+  frontend: 
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/frontend
+    environment:
+      - HOST=0.0.0.0
+    command: npm run dev
+  
   backend:
     build: 
       context: ./backend
@@ -9,4 +21,6 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/backend
+    env_file:
+      - .env
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
