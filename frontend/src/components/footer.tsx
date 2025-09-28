@@ -1,8 +1,10 @@
-function Footer() {
+export default function Footer() {
   return (
-    <footer className="bg-white border-t py-4 text-center text-gray-500 text-sm">
-      © {new Date().getFullYear()} Oberlin College Varisty Basball Team. All rights reserved.
+    <footer className="bg-black text-gray-200 p-6 text-center">
+      <p>
+        © 2025 <span className="text-gold-400 font-semibold">OC Baseball</span>. 
+        Built for baseball lovers.
+      </p>
     </footer>
   );
 }
-export default Footer;
