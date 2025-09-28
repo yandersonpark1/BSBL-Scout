@@ -16,11 +16,9 @@ export default function UploadPage() {
     <div className="min-h-screen bg-black flex flex-col">
       <Navbar />
 
-      
       <main className="flex-grow">
         <Hero />
 
-        
         <div className="text-center my-8 bg-black">
           <button
             onClick={scrollToUploadForm}
@@ -34,7 +32,7 @@ export default function UploadPage() {
         </div>
 
         <Features />
-        
+
         <section ref={uploadRef} className="bg-black py-12">
           <div className="max-w-2xl mx-auto">
             <UploadForm />
@@ -46,5 +44,3 @@ export default function UploadPage() {
     </div>
   );
 }
-
-

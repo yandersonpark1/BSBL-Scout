@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
-  const navigate = useNavigate(); // 🔑 for navigation
+  const navigate = useNavigate();
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -23,6 +23,7 @@ function UploadForm() {
     formData.append("file", file);
 
     try {
+      // 1️⃣ Upload CSV
       const response = await fetch("http://localhost:8000/upload", {
         method: "POST",
         body: formData,
@@ -30,9 +31,28 @@ function UploadForm() {
 
       if (response.ok) {
         const json = await response.json();
+        const inserted_id = json.inserted_id;
 
-        // Navigate to Insights page and pass chart data
-        navigate("/insights", { state: { chartData: json.chart_data } });
+        // 2️⃣ Fetch Strike data
+        const strikeRes = await fetch(
+          `http://localhost:8000/insights/is_strike_by_id?file_id=${inserted_id}`
+        );
+        const strikeDataJson = await strikeRes.json();
+
+        // 3️⃣ Fetch Trajectory data
+        const trajRes = await fetch(
+          `http://localhost:8000/insights/trajectory_by_id?file_id=${inserted_id}`
+        );
+        const trajDataJson = await trajRes.json();
+
+        // 4️⃣ Navigate to Insights page with both datasets
+        navigate("/insights", {
+          state: {
+            chartData: strikeDataJson.is_strike,
+            trajectoryData: trajDataJson.trajectory,
+            inserted_id,
+          },
+        });
       } else {
         setStatus("❌ Upload failed.");
       }
@@ -71,3 +91,4 @@ function UploadForm() {
 }
 
 export default UploadForm;
+
