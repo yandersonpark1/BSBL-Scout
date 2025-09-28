@@ -40,7 +40,7 @@ function UploadForm() {
 
   return (
     <div className="max-w-lg mx-auto p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl font-bold mb-4">Upload CSV</h2>
+      <h2 className="text-2xl text-center text-red-500 font-bold mb-4">Upload CSV</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="file"
@@ -50,15 +50,15 @@ function UploadForm() {
             file:mr-4 file:py-2 file:px-4
             file:rounded-full file:border-0
             file:text-sm file:font-semibold
-            file:bg-blue-50 file:text-blue-700
-            hover:file:bg-blue-100"
+            file:bg-black file:text-white
+            hover:file:bg-red-100"
         />
         {file && (
           <p className="text-gray-600">Selected file: {file.name}</p>
         )}
         <button
           type="submit"
-          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-300 background-transparent"
         >
           Upload
         </button>
