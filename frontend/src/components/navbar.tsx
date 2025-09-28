@@ -1,15 +1,21 @@
 export default function Navbar() {
   return (
-    <header className="bg-white shadow-md">
-      <nav className="max-w-7xl mx-auto flex justify-between items-center p-4">
-        <h1 className="text-2xl font-bold text-blue-600">OC Baseball</h1>
-        <ul className="flex gap-6 text-gray-700">
-          <li>Home</li>
-          <li>About</li>
-          <li>Upload</li>
-          <li>Docs</li>
-        </ul>
-      </nav>
+    <header className="top-0 bg-white backdrop-blur-md z-50 border-b border-black-200">
+      <div className="max-w-6xl mx-auto py-4 px-6 flex items-center justify-between">
+        <div className="flex items-center">
+          <img 
+            src="/oberlin.png" 
+            alt="OC Bsbl" 
+            className="h-12 w-auto mr-2" 
+          />
+        </div>
+
+        <nav className="space-x-10">
+          <a href="#" className="text-black-600 hover:text-blue-600">Home</a>
+          <a href="#" className="text-black-600 hover:text-blue-600">Dashboard</a>
+          <a href="#" className="text-black-600 hover:text-blue-600">About</a>
+        </nav>
+      </div>
     </header>
   );
 }
