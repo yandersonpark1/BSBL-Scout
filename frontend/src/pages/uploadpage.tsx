@@ -5,7 +5,7 @@ import Features from "../components/features";
 import Footer from "../components/footer";
 import UploadForm from "../components/uploadform";
 
-export default function HomePage() {
+export default function UploadPage() {
   const uploadRef = useRef<HTMLDivElement>(null);
 
   const scrollToUploadForm = () => {
@@ -34,7 +34,6 @@ export default function HomePage() {
         </div>
 
         <Features />
-
         
         <section ref={uploadRef} className="bg-black py-12">
           <div className="max-w-2xl mx-auto">

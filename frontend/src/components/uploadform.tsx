@@ -1,8 +1,10 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
+  const navigate = useNavigate(); // 🔑 for navigation
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
@@ -20,7 +22,6 @@ function UploadForm() {
     const formData = new FormData();
     formData.append("file", file);
 
-    //client requesting API endpoint to server
     try {
       const response = await fetch("http://localhost:8000/upload", {
         method: "POST",
@@ -28,7 +29,10 @@ function UploadForm() {
       });
 
       if (response.ok) {
-        setStatus("✅ File uploaded and processed successfully!");
+        const json = await response.json();
+
+        // Navigate to Insights page and pass chart data
+        navigate("/insights", { state: { chartData: json.chart_data } });
       } else {
         setStatus("❌ Upload failed.");
       }
@@ -53,12 +57,10 @@ function UploadForm() {
             file:bg-black file:text-white
             hover:file:bg-red-100"
         />
-        {file && (
-          <p className="text-gray-600">Selected file: {file.name}</p>
-        )}
+        {file && <p className="text-gray-600">Selected file: {file.name}</p>}
         <button
           type="submit"
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-300 background-transparent"
+          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-300"
         >
           Upload
         </button>
