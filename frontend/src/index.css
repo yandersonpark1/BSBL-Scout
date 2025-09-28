@@ -1,3 +1,16 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes baseballMove {
+  0% {
+    left: -50px; /* start off-screen */
+  }
+  100% {
+    left: 100%; /* move across the screen */
+  }
+}
+
+.animate-baseball {
+  animation: baseballMove 3s linear infinite;
+}
