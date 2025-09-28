@@ -1,24 +1,22 @@
 export default function Features() {
   return (
-    <section className="bg-gray-100 py-12">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center">
-        
-        <div className="p-6 border rounded-xl shadow-sm bg-white">
-          <h3 className="font-bold text-lg">Reliable</h3>
-          <p className="mt-2 text-gray-500">Handles CSV files from rapsodo, trackman, and any pitch platform</p>
-        </div>
-
-        <div className="p-6 border rounded-xl shadow-sm bg-white">
-          <h3 className="font-bold text-lg">Visualize Pitch Trends</h3>
-          <p className="mt-2 text-gray-500">Generate insights from pitch data.</p>
-        </div>
-        
-        <div className="p-6 border rounded-xl shadow-sm bg-white">
-          <h3 className="font-bold text-lg">Automated Reports</h3>
-          <p className="mt-2 text-gray-500">Get results in seconds, not hours.</p>
-        
-        </div>
+    <section className="bg-black py-12">
+      <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center">
+        {[
+          { title: "Reliability", desc: "Automatically handle messy CSVs" },
+          { title: "Visualization", desc: "Generate visuals from pitch data." },
+          { title: "Automated Reports", desc: "Get results in seconds, not hours." },
+        ].map((f, i) => (
+          <div
+            key={i}
+            className="p-10 border-2 border-gold-400 rounded-xl shadow-md bg-white hover:shadow-xl transition"
+          >
+            <h3 className="font-bold text-xl text-red-600">{f.title}</h3>
+            <p className="mt-2 text-gray-600">{f.desc}</p>
+          </div>
+        ))}
       </div>
     </section>
   );
 }
+
