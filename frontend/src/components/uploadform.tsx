@@ -4,14 +4,12 @@ function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
 
-  // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       setFile(e.target.files[0]);
     }
   };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!file) {
