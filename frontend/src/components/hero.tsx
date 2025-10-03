@@ -1,29 +1,43 @@
-export default function Hero() {
+interface HeroProps {
+  scrollToUploadForm: () => void;
+}
+
+export default function Hero({ scrollToUploadForm }: HeroProps) {
   return (
-    <section className="w-full flex flex-col justify-center items-center text-center p-12 bg-black">
-        <div className="w-full max-w-6xl mx-auto text-center">
-            <div className="relative w-full h-24 overflow-hidden mb-6">
-                <img
-                    src="/baseball.gif"
-                    alt="Baseball"
-                    className="absolute top-1/2 left-0 h-12 w-12 transform -translate-y-1/2 animate-baseball"
-                />
-            </div>
+    <section className="relative w-full min-h-screen flex items-center justify-center text-center px-6 overflow-hidden">
+      <div className="relative z-10 w-full max-w-6xl">
 
-        <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6 leading-tight">
-            <span className="bg-yellow-100 bg-clip-text text-transparent block">
-                From Numbers to Development
-            </span>
+        {/* First Button */}
+        <button className="mt-20 px-8 py-4 mb-6 rounded-full border-2 border-blue-300 bg-transparent hover:scale-105 hover:shadow-2xl cursor-default">
+          <span className="bg-gradient-to-r from-blue-300 to-green-300 bg-clip-text text-transparent font-semibold text-lg">
+            ✦ Training with Purpose Starts Here ✦
+          </span>
+        </button>
 
-            <span className="bg-gradient-to-r from-red-500 to-yellow-500 bg-clip-text text-transparent block">
-                Power Up Your Pitch Development with
-            </span>
-
-            <span className="bg-yellow-100 bg-clip-text text-transparent block">
-                Data-Driven Insights and Visuals
-            </span>
+        {/* Heading */}
+        <h2 className="text-3xl sm:text-3xl lg:text-5xl font-bold leading-relaxed mt-12">
+          <span className="bg-blue-100 bg-clip-text text-transparent block mb-4">
+            From Numbers to Development
+          </span>
+          <span className="bg-gradient-to-r from-blue-300 to-green-300 bg-clip-text text-transparent block mb-4">
+            Power Up Your Pitch Development with
+          </span>
+          <span className="bg-blue-100 bg-clip-text text-transparent block pb-3">
+            Data-Driven Insights and Visuals
+          </span>
         </h2>
-        </div>
+
+        {/* Scroll Button */}
+        <button
+          onClick={scrollToUploadForm}
+          className="mt-20 group px-8 py-4 mb-12 rounded-full bg-white text-blue-400 font-semibold text-lg hover:bg-blue-500 hover:text-gray-900 transition-all duration-300 transform hover:scale-105 hover:shadow-2xl">
+          GIVE IT A TRY TODAY!
+          <span className="ml-2 group-hover:translate-x-1 transition-transform duration-300 inline-block">
+            →
+          </span>
+        </button>
+
+      </div>
     </section>
   );
 }
