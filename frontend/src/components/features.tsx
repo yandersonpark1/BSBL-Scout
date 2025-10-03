@@ -1,6 +1,6 @@
 export default function Features() {
   return (
-    <section className="bg-black py-12">
+    <section className="py-12">
       <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center">
         {[
           { title: "Reliability", desc: "Automatically handle messy CSVs" },
