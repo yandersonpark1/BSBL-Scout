@@ -1,3 +1,4 @@
+import { CloudArrowUpIcon } from "@heroicons/react/24/outline"; // Make sure you have heroicons installed
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -23,7 +24,6 @@ function UploadForm() {
     formData.append("file", file);
 
     try {
-      // 1️⃣ Upload CSV
       const response = await fetch("http://localhost:8000/upload", {
         method: "POST",
         body: formData,
@@ -32,27 +32,6 @@ function UploadForm() {
       if (response.ok) {
         const json = await response.json();
         const inserted_id = json.inserted_id;
-
-        // 2️⃣ Fetch Strike data
-        const strikeRes = await fetch(
-          `http://localhost:8000/insights/is_strike_by_id?file_id=${inserted_id}`
-        );
-        const strikeDataJson = await strikeRes.json();
-
-        // 3️⃣ Fetch Trajectory data
-        const trajRes = await fetch(
-          `http://localhost:8000/insights/trajectory_by_id?file_id=${inserted_id}`
-        );
-        const trajDataJson = await trajRes.json();
-
-        // 4️⃣ Navigate to Insights page with both datasets
-        navigate("/insights", {
-          state: {
-            chartData: strikeDataJson.is_strike,
-            trajectoryData: trajDataJson.trajectory,
-            inserted_id,
-          },
-        });
       } else {
         setStatus("❌ Upload failed.");
       }
@@ -62,33 +41,53 @@ function UploadForm() {
     }
   };
 
-  return (
-    <div className="max-w-lg mx-auto p-6 bg-white rounded-xl shadow-md">
-      <h2 className="text-2xl text-center text-red-500 font-bold mb-4">Upload CSV</h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
+return (
+  <div className="max-w-lg mx-auto p-8 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700">
+    <h2 className="text-3xl text-center font-extrabold bg-gradient-to-r from-blue-300 to-green-300 bg-clip-text text-transparent mb-6">
+      Upload CSV
+    </h2>
+
+    <form onSubmit={handleSubmit} className="space-y-6">
+      
+      <label
+        htmlFor="file-upload"
+        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-gray-500 rounded-2xl cursor-pointer hover:border-blue-400 transition-colors duration-200"
+      >
+        <CloudArrowUpIcon className="w-12 h-12 text-blue-400 mb-3" />
+        <span className="text-gray-400">
+          Click to select a CSV file or drag it here
+        </span>
         <input
+          id="file-upload"
           type="file"
           accept=".csv"
           onChange={handleFileChange}
-          className="block w-full text-sm text-gray-500
-            file:mr-4 file:py-2 file:px-4
-            file:rounded-full file:border-0
-            file:text-sm file:font-semibold
-            file:bg-black file:text-white
-            hover:file:bg-red-100"
+          className="hidden"
         />
-        {file && <p className="text-gray-600">Selected file: {file.name}</p>}
-        <button
-          type="submit"
-          className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-300"
-        >
-          Upload
-        </button>
-      </form>
-      {status && <p className="mt-4 text-sm">{status}</p>}
-    </div>
-  );
+      </label>
+
+      {file && (
+        <p className="text-center text-gray-300 italic">
+          Selected file: <span className="text-white font-medium">{file.name}</span>
+        </p>
+      )}
+
+      
+      <button
+        type="submit"
+        className="w-full px-6 py-3 bg-gradient-to-r from-blue-400 to-green-400 rounded-full text-white font-bold text-lg hover:scale-105 transition-transform duration-200 shadow-lg"
+      >
+        Upload
+      </button>
+    </form>
+
+    {status && (
+      <p className="mt-4 text-center text-sm text-gray-300">
+        {status}
+      </p>
+    )}
+  </div>
+);
 }
 
 export default UploadForm;
-
