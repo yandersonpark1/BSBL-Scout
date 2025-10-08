@@ -7,7 +7,7 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     # only origin can make request to backend 
-    allow_origins=["https://localhost:5173"], 
+    allow_origins=["http://localhost:5173"], 
     allow_credentials=True, 
     #all HTTP methods allowed
     allow_methods = ["*"],
