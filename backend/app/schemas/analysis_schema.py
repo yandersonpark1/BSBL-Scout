@@ -18,4 +18,17 @@ class PitchMix(BaseModel):
 class PitchMixAnalysis(BaseModel): 
     filename: str
     pitch_mix: list[PitchMix]
+
+class Fastballs(BaseModel): 
+    No: int 
+    pitchType: str = Field(..., alias="Pitch Type")
+    Velocity: float
+    
+class FastballVelocity(BaseModel): 
+    filename: str 
+    fastballs: list[Fastballs]
+    count: int 
+    
+
+    
     
