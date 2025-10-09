@@ -15,4 +15,5 @@ async def upload_file(file: UploadFile = File(...)):
     
     #calls handle_upload function from parser module to process uploaded file
     result = await parser.handle_upload(file)
+    
     return result
