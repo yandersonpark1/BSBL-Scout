@@ -4,7 +4,7 @@ import Hero from "../components/hero";
 import Features from "../components/features";
 import UploadForm from "../components/uploadform";
 import Footer from "../components/footer";
-import Background from "../components/Background";
+import Background from "../components/background";
 
 export default function UploadPage() {
   const uploadRef = useRef<HTMLDivElement>(null);
