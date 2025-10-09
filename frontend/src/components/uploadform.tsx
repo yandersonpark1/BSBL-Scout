@@ -2,6 +2,8 @@ import { CloudArrowUpIcon } from "@heroicons/react/24/outline"; // Make sure you
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
+
+
 function UploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<string>("");
@@ -13,31 +15,47 @@ function UploadForm() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!file) {
-      setStatus("⚠️ Please select a file first.");
-      return;
-    }
-
+  //Upload function for post api to database => return file id for stored document in database
+  const uploadFile = async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
 
-    try {
-      const response = await fetch("http://localhost:8000/upload", {
-        method: "POST",
-        body: formData,
-      });
+    const response = await fetch("http://localhost:8000/upload/pitch_data_csv", {
+      method: "POST",
+      body: formData,
+    });
 
-      if (response.ok) {
-        const json = await response.json();
-        const inserted_id = json.inserted_id;
-      } else {
-        setStatus("❌ Upload failed.");
-      }
-    } catch (error) {
-      console.error(error);
-      setStatus("⚠️ Error connecting to server.");
+    if (!response.ok) {
+      throw new Error("Upload Failed");
+    }
+    
+    //returned value from backend - {message: '', inserted_id: '', rows_inserted: int}
+    const data = await response.json();
+    // Stores ID from recent upload to use in analysis page
+    const file_id = data.inserted_id;
+    return file_id; 
+  };
+
+  // Handles form submission after putting the document into the database
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!file) {
+      setStatus("Please select a file first.");
+      return;
+    }
+
+    try {
+      const uploadedFileID = await uploadFile(file);
+      setStatus("Upload successful!");
+      
+
+      // Navigate to analysis page with the file ID
+      navigate(`/insights/${uploadedFileID}`);
+    }
+
+    catch (error) {
+      console.error("Error uploading file: ", error);
+      setStatus("Upload failed. Please try again. ${error.message}");
     }
   };
 
