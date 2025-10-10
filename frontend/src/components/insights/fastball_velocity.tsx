@@ -9,7 +9,7 @@ interface Fastball {
   No: number
   "Pitch Type": string
   Velocity: number
-  PitchIndex?: number // Add optional PitchIndex for sequential numbering
+  PitchIndex?: number
 }
 
 interface FastballVelocityResponse {
@@ -35,10 +35,11 @@ export function FastballVelocityChart({ fileId }: { fileId: string }) {
             No: Number(f.No),
             "Pitch Type": f["Pitch Type"] ?? "Unknown",
             Velocity: Number(f.Velocity),
-            PitchIndex: index + 1, // sequential numbering
+            PitchIndex: index + 1,
           }))
           .filter(f => !isNaN(f.No) && !isNaN(f.Velocity))
 
+        console.log(formatted)
         setData(formatted)
       } catch (err: any) {
         console.error(err)
@@ -59,42 +60,58 @@ export function FastballVelocityChart({ fileId }: { fileId: string }) {
     <Card className="py-4 sm:py-0">
       <CardHeader>
         <CardTitle>Fastball Velocity Chart</CardTitle>
-        <CardDescription>Velocity (mph) by pitch number</CardDescription>
+        <CardDescription>See how your velocity carries throughout your outing.</CardDescription>
       </CardHeader>
+
+      {/* Bigger height: h-[420px] on small screens, larger on sm+ */}
       <CardContent className="px-2 sm:p-6">
-        <ChartContainer config={{ Velocity: { label: "Fastball", color: "var(--chart-1)" } }} className="h-[300px] w-full">
-          <LineChart data={data} margin={{ top: 20, bottom: 20, left: 12, right: 12 }}>
+        <ChartContainer
+          config={{ Velocity: { label: "Fastball", color: "var(--chart-1)" } }}
+          className="h-[420px] sm:h-[520px] w-full"
+        >
+          <LineChart
+            data={data}
+            // increase margins so chart has breathing room
+            margin={{ top: 30, bottom: 30, left: 24, right: 24 }}
+          >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
+
+            {/* Add horizontal padding so first/last points aren't stuck to the edges */}
             <XAxis
               dataKey="PitchIndex"
               tickLine={false}
               axisLine={false}
-              label={{ value: "Pitches", position: "insideBottomLeft", offset: -5 }}
+              padding={{ left: 20, right: 20 }}
             />
+
             <YAxis
               dataKey="Velocity"
               tickLine={false}
               axisLine={false}
               label={{ value: "Velocity (mph)", angle: -90, position: "insideLeft" }}
+              domain={[70, 100]}
+              ticks={[70, 80, 90, 100]}
             />
+
             <ChartTooltip
               content={
                 <ChartTooltipContent
-                  nameKey="Pitch Type"
-                  labelFormatter={(val) => {
-                    const pitch = data.find(d => d.PitchIndex === val)
-                    return `Pitch #${pitch?.No ?? "?"}`
+                  nameKey="Velocity"
+                  labelFormatter={() => {
+                    return "Fastball"
                   }}
                 />
               }
             />
+
+            {/* Blue line + matching dot / activeDot styling */}
             <Line
               type="monotone"
               dataKey="Velocity"
-              stroke="var(--chart-1)"
-              strokeWidth={2}
-              dot={{ r: 4 }}
-              activeDot={{ r: 6 }}
+              stroke="#2563eb"         // blue (Tailwind blue-600 hex)
+              strokeWidth={3}         // slightly thicker line
+              dot={{ r: 4, stroke: "#2563eb", fill: "#ffffff", strokeWidth: 2 }}
+              activeDot={{ r: 6, stroke: "#2563eb", fill: "#ffffff", strokeWidth: 2 }}
             />
           </LineChart>
         </ChartContainer>
