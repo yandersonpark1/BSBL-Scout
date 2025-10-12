@@ -12,8 +12,8 @@ class VelocityAnalysis(BaseModel):
 
 class PitchMix(BaseModel): 
     pitch_type: str
-    vb: float = Field(..., alias="HB (trajectory)")
-    hb: float = Field(..., alias="VB (trajectory)")
+    vb: float = Field(..., alias="VB (trajectory)")
+    hb: float = Field(..., alias="HB (trajectory)")
     
 class PitchMixAnalysis(BaseModel): 
     filename: str
