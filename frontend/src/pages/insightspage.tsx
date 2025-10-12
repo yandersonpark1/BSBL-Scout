@@ -1,4 +1,5 @@
 import { FastballVelocityChart } from "@/components/insights/fastball_velocity";
+import PitchMixChart from "@/components/insights/pitch_mix";
 import { useParams } from "react-router-dom"; 
 
 export default function InsightsPage() {
@@ -16,9 +17,14 @@ export default function InsightsPage() {
                 Pulse Labs Pitching Insights
             </h1>
 
-            <div className="max-w-4xl mx-auto"> 
+            <div className="max-w-4xl mx-auto mb-12"> 
                 <FastballVelocityChart fileId={fileID} />
             </div>
+
+            <div className="max-w-4xl mx-auto mb-12">
+                < PitchMixChart fileId={fileID} />
+            </div>
+
         </div>
     );
 }
