@@ -24,7 +24,6 @@ def analyze_fastball_velocity(file_id: str):
     
     fastball_list = fastballs[['No', 'Pitch Type', 'Velocity']].to_dict(orient="records")
     
-    
     #returns {filename: x, fastballs: [{Pitch_Type: x, Velocity: y}, {...}, ...]}
     return {
         "filename": doc['filename'],
