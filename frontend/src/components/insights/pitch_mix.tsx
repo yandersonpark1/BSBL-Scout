@@ -92,7 +92,7 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
     Curveball: "#00FF00" 
   };
 
-  // Sort dynamically — only include existing pitch types, preserving order
+  
   const orderedEntries = Object.entries(grouped)
     .filter(([pitchType]) => pitchOrder.includes(pitchType))
     .sort(
@@ -100,7 +100,7 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
         pitchOrder.indexOf(a) - pitchOrder.indexOf(b)
     );
 
-  // Include any unrecognized pitch types at the end (fallback)
+  
   const otherEntries = Object.entries(grouped).filter(
     ([pitchType]) => !pitchOrder.includes(pitchType)
   );
@@ -114,7 +114,7 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
     if (!payload) return null;
 
     return (
-      <div style={{ paddingLeft: 30 }}> {/* <-- adds spacing from the chart */}
+      <div style={{ paddingLeft: 30 }}> 
         <h3 style={{ marginBottom: 8, fontSize: "16px", fontWeight: "600", color: "black" }}>
           Pitch Types
         </h3>
