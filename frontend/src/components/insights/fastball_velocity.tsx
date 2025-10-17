@@ -63,7 +63,7 @@ export function FastballVelocityChart({ fileId }: { fileId: string }) {
         <CardDescription>See how your velocity carries throughout your outing.</CardDescription>
       </CardHeader>
 
-      {/* Bigger height: h-[420px] on small screens, larger on sm+ */}
+      
       <CardContent className="px-2 sm:p-6">
         <ChartContainer
           config={{ Velocity: { label: "Fastball", color: "var(--chart-1)" } }}
@@ -71,12 +71,12 @@ export function FastballVelocityChart({ fileId }: { fileId: string }) {
         >
           <LineChart
             data={data}
-            // increase margins so chart has breathing room
+           
             margin={{ top: 30, bottom: 30, left: 24, right: 24 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
 
-            {/* Add horizontal padding so first/last points aren't stuck to the edges */}
+            
             <XAxis
               dataKey="PitchIndex"
               tickLine={false}
@@ -104,12 +104,12 @@ export function FastballVelocityChart({ fileId }: { fileId: string }) {
               }
             />
 
-            {/* Blue line + matching dot / activeDot styling */}
+            
             <Line
               type="monotone"
               dataKey="Velocity"
-              stroke="#2563eb"         // blue (Tailwind blue-600 hex)
-              strokeWidth={3}         // slightly thicker line
+              stroke="#2563eb"         
+              strokeWidth={3}         
               dot={{ r: 4, stroke: "#2563eb", fill: "#ffffff", strokeWidth: 2 }}
               activeDot={{ r: 6, stroke: "#2563eb", fill: "#ffffff", strokeWidth: 2 }}
             />
