@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  ReferenceLine
 } from "recharts";
 
 type RawPitch = {
@@ -106,6 +107,39 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
 
   const finalEntries = [...orderedEntries, ...otherEntries];
 
+  ///
+  const renderCustomLegend = (props: any) => {
+    const { payload } = props;
+
+    if (!payload) return null;
+
+    return (
+      <div style={{ paddingLeft: 30 }}> {/* <-- adds spacing from the chart */}
+        <h3 style={{ marginBottom: 8, fontSize: "16px", fontWeight: "600", color: "black" }}>
+          Pitch Types
+        </h3>
+        <ul className="list-none m-0 p-0">
+          {payload.map((entry: any, index: number) => (
+            <li key={`item-${index}`} className="flex items-center mb-1">
+              <span
+                style={{
+                  display: "inline-block",
+                  width: 10, // smaller dot
+                  height: 10,
+                  backgroundColor: entry.color,
+                  borderRadius: "50%",
+                  marginRight: 8,
+                }}
+              />
+              <span style={{ color: "black", fontSize: "14px" }}>{entry.value}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    );
+  };
+
+
   return (
     <div className="w-full max-w-6xl bg-white rounded-xl shadow-md p-6 mb-8">
       <h2 className="text-2xl font-semibold text-center mb-6 text-black">
@@ -116,24 +150,32 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
         <ResponsiveContainer width="100%" height="100%">
           <ScatterChart margin={{ top: 15, right: 15, bottom: 20, left: 20 }}>
             <CartesianGrid strokeDasharray="3 3" />
+            <ReferenceLine x={0} stroke="black" strokeWidth={2} />
+            <ReferenceLine y={0} stroke="black" strokeWidth={2} />
+
             <XAxis
               type="number"
               dataKey="hb"
               name="Horizontal Break"
               unit="in"
-              domain={[-30, 30]}
+              domain={[-32, 32]}          
+              ticks={[-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25]} 
               axisLine={false}
               tickLine={false}
             />
+
             <YAxis
               type="number"
               dataKey="vb"
               name="Vertical Break"
               unit="in"
-              domain={[-30, 30]}
+              domain={[-32, 32]}      
+              ticks={[-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25]}
               axisLine={false}
               tickLine={false}
             />
+
+
             <Tooltip
               cursor={{ strokeDasharray: "3 3" }}
               content={({ active, payload }) => {
@@ -152,12 +194,14 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
               return null;
               }}
             />
+            
             <Legend
               verticalAlign="middle"
               align="right"
               layout="vertical"
-              height={36}
+              content={renderCustomLegend}
             />
+
 
             {finalEntries.map(([pitchType, pitches]) => (
               <Scatter
