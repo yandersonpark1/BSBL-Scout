@@ -1,4 +1,5 @@
 """Backend connecting to Database for Oberlin Pitching Staff"""
+''' Database used for CSV file upload for data insights'''
 from pymongo.mongo_client import MongoClient
 from pymongo.server_api import ServerApi
 import os
