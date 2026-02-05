@@ -1,8 +1,27 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware 
+from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.api import routes_upload, routes_analysis
+from app.database.db_connect import init_db, close_db
 
-app = FastAPI() 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Manage application lifecycle:
+    - Startup: Initialize database tables
+    - Shutdown: Close database connections
+    """
+    # Startup
+    print("Starting up application...")
+    await init_db()
+    yield
+    # Shutdown
+    print("Shutting down application...")
+    await close_db()
+
+
+app = FastAPI(lifespan=lifespan) 
 
 app.add_middleware(
     CORSMiddleware,
