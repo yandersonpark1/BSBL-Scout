@@ -24,10 +24,22 @@ class Fastballs(BaseModel):
     pitchType: str = Field(..., alias="Pitch Type")
     Velocity: float
     
-class FastballVelocity(BaseModel): 
-    filename: str 
+class FastballVelocity(BaseModel):
+    filename: str
     fastballs: list[Fastballs]
-    count: int 
+    count: int
+
+class PitchDataPoint(BaseModel):
+    pitch_number: int
+    velocity: float
+
+class PitchTypeSeries(BaseModel):
+    pitch_type: str
+    data: list[PitchDataPoint]
+
+class VelocityByPitchNumber(BaseModel):
+    filename: str
+    series: list[PitchTypeSeries] 
     
 
     

@@ -1,6 +1,7 @@
 import { FastballVelocityChart } from "@/components/insights/fastball_velocity";
 import PitchMixChart from "@/components/insights/pitch_mix";
-import { useParams } from "react-router-dom"; 
+import { VelocityByPitchTypeChart } from "@/components/insights/velocity_by_pitch_type";
+import { useParams } from "react-router-dom";
 import Footer from "../components/footer";
 
 export default function InsightsPage() {
@@ -18,12 +19,16 @@ export default function InsightsPage() {
                 Pulse Labs Pitching Insights
             </h1>
 
-            <div className="max-w-4xl mx-auto mb-12"> 
+            <div className="max-w-4xl mx-auto mb-12">
                 <FastballVelocityChart fileId={fileID} />
             </div>
 
             <div className="max-w-4xl mx-auto mb-12">
-                < PitchMixChart fileId={fileID} />
+                <VelocityByPitchTypeChart fileId={fileID} />
+            </div>
+
+            <div className="max-w-4xl mx-auto mb-12">
+                <PitchMixChart fileId={fileID} />
             </div>
 
             <div>   
