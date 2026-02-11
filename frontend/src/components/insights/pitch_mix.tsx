@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ScatterChart,
   Scatter,
@@ -8,10 +8,10 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
-  ReferenceLine
+  ReferenceLine,
 } from "recharts";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 type RawPitch = {
   pitch_type: string;
@@ -30,13 +30,27 @@ type PitchMixResponse = {
   pitch_mix: RawPitch[];
 };
 
+// Shared color palette — mirrors velocity_by_pitch_type
+const PITCH_COLORS: Record<string, string> = {
+  Fastball:  "#2563eb",
+  ChangeUp:  "#16a34a",
+  Slider:    "#dc2626",
+  Curveball: "#9333ea",
+  Sinker:    "#ea580c",
+  Cutter:    "#0891b2",
+};
+
+const PITCH_ORDER = ["Fastball", "ChangeUp", "Slider", "Curveball", "Sinker", "Cutter"];
+
+const FONT = "Inter, ui-sans-serif, system-ui, sans-serif";
+
 export default function PitchMixChart({ fileId }: { fileId: string }) {
   const [data, setData] = useState<PitchMixResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [activePitchType, setActivePitchType] = useState<string>("All");
 
   useEffect(() => {
-    const url = `http://localhost:8000/analysis/pitch_mix/${fileId}`;
-    fetch(url)
+    fetch(`http://localhost:8000/analysis/pitch_mix/${fileId}`)
       .then((res) => {
         if (!res.ok) throw new Error(`API error ${res.status}`);
         return res.json();
@@ -48,173 +62,144 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
       });
   }, [fileId]);
 
-  if (error) {
-    return (
-      <div className="flex justify-center items-center h-96 text-red-500">
-        {error}
-      </div>
-    );
-  }
+  if (error) return <p className="text-red-500 p-4">{error}</p>;
+  if (!data)  return <p className="text-muted-foreground p-4">Loading pitch mix data...</p>;
 
-  if (!data) {
-    return (
-      <div className="flex justify-center items-center h-96 text-gray-500">
-        Loading chart...
-      </div>
-    );
-  }
-
-  // Group by pitch type
+  // Group pitches by type
   const grouped: Record<string, Pitch[]> = {};
-
   data.pitch_mix.forEach((p) => {
     const vb = Number(p["VB (trajectory)"]);
     const hb = Number(p["HB (trajectory)"]);
     if (Number.isNaN(vb) || Number.isNaN(hb)) return;
-
-    const cleanPitch: Pitch = {
-      pitch_type: p.pitch_type,
-      vb,
-      hb,
-    };
-
-    const key = cleanPitch.pitch_type || "Unknown";
+    const key = p.pitch_type || "Unknown";
     if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(cleanPitch);
+    grouped[key].push({ pitch_type: p.pitch_type, vb, hb });
   });
 
-  // Define preferred order and colors
-  const pitchOrder = ["Fastball", "ChangeUp", "Slider", "Curveball"];
-  const pitchColors: Record<string, string> = {
-    Fastball: "#000000",
-    ChangeUp: "#0000FF", 
-    Slider: "#FF0000",   
-    Curveball: "#00FF00" 
-  };
+  const orderedEntries = [
+    ...Object.entries(grouped)
+      .filter(([t]) => PITCH_ORDER.includes(t))
+      .sort(([a], [b]) => PITCH_ORDER.indexOf(a) - PITCH_ORDER.indexOf(b)),
+    ...Object.entries(grouped).filter(([t]) => !PITCH_ORDER.includes(t)),
+  ];
 
-  
-  const orderedEntries = Object.entries(grouped)
-    .filter(([pitchType]) => pitchOrder.includes(pitchType))
-    .sort(
-      ([a], [b]) =>
-        pitchOrder.indexOf(a) - pitchOrder.indexOf(b)
-    );
+  const pitchTypes = orderedEntries.map(([t]) => t);
 
-  
-  const otherEntries = Object.entries(grouped).filter(
-    ([pitchType]) => !pitchOrder.includes(pitchType)
-  );
-
-  const finalEntries = [...orderedEntries, ...otherEntries];
-
-  ///
-  const renderCustomLegend = (props: any) => {
-    const { payload } = props;
-
-    if (!payload) return null;
-
-    return (
-      <div style={{ paddingLeft: 30 }}> 
-        <h3 style={{ marginBottom: 8, fontSize: "16px", fontWeight: "600", color: "black" }}>
-          Pitch Types
-        </h3>
-        <ul className="list-none m-0 p-0">
-          {payload.map((entry: any, index: number) => (
-            <li key={`item-${index}`} className="flex items-center mb-1">
-              <span
-                style={{
-                  display: "inline-block",
-                  width: 10, // smaller dot
-                  height: 10,
-                  backgroundColor: entry.color,
-                  borderRadius: "50%",
-                  marginRight: 8,
-                }}
-              />
-              <span style={{ color: "black", fontSize: "14px" }}>{entry.value}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    );
-  };
-
+  const displayEntries = activePitchType === "All"
+    ? orderedEntries
+    : orderedEntries.filter(([t]) => t === activePitchType);
 
   return (
-    <div className="w-full max-w-6xl bg-white rounded-xl shadow-md p-6 mb-8">
-      <h2 className="text-2xl font-semibold text-center mb-6 text-black">
-        Pitch Mix (Horizontal and Vertical Break)
-      </h2>
+    <Card className="py-4 sm:py-0">
+      <CardHeader>
+        <CardTitle>Pitch Mix</CardTitle>
+        <CardDescription>Horizontal and vertical break by pitch type.</CardDescription>
+      </CardHeader>
 
-      <div className="h-[650px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 15, right: 15, bottom: 20, left: 20 }}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <ReferenceLine x={0} stroke="black" strokeWidth={2} />
-            <ReferenceLine y={0} stroke="black" strokeWidth={2} />
+      <CardContent className="px-2 sm:p-6">
+        <div className="flex gap-4 h-[680px]">
+          {/* Chart */}
+          <div className="flex-1 min-w-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 20 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
 
-            <XAxis
-              type="number"
-              dataKey="hb"
-              name="Horizontal Break"
-              unit="in"
-              domain={[-32, 32]}          
-              ticks={[-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25]} 
-              axisLine={false}
-              tickLine={false}
-            />
+                <ReferenceLine x={0} stroke="#6b7280" strokeWidth={1.5} strokeDasharray="4 4" />
+                <ReferenceLine y={0} stroke="#6b7280" strokeWidth={1.5} strokeDasharray="4 4" />
 
-            <YAxis
-              type="number"
-              dataKey="vb"
-              name="Vertical Break"
-              unit="in"
-              domain={[-32, 32]}      
-              ticks={[-25, -20, -15, -10, -5, 0, 5, 10, 15, 20, 25]}
-              axisLine={false}
-              tickLine={false}
-            />
+                <XAxis
+                  type="number"
+                  dataKey="hb"
+                  name="Horizontal Break"
+                  unit="in"
+                  domain={[-40, 40]}
+                  ticks={[-40, -30, -20, -10, 0, 10, 20, 30, 40]}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#111827", fontSize: 13, fontFamily: FONT }}
+                  label={{ value: "Horizontal Break (in)", position: "insideBottom", offset: -20, fill: "#111827", fontSize: 14, fontFamily: FONT }}
+                />
 
+                <YAxis
+                  type="number"
+                  dataKey="vb"
+                  name="Vertical Break"
+                  unit="in"
+                  domain={[-40, 40]}
+                  ticks={[-40, -30, -20, -10, 0, 10, 20, 30, 40]}
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fill: "#111827", fontSize: 13, fontFamily: FONT }}
+                  label={{ value: "Vertical Break (in)", angle: -90, position: "insideLeft", offset: 10, fill: "#111827", fontSize: 14, fontFamily: FONT }}
+                />
 
-            <Tooltip
-              cursor={{ strokeDasharray: "3 3" }}
-              content={({ active, payload }) => {
-              if (active && payload && payload.length) {
-                const pitch = payload[0].payload;
-                return (
-                  <div className="bg-white text-black p-2 rounded shadow">
-                    <p>
-                      <strong>{pitch.pitch_type}</strong>
-                    </p>
-                    <p>HB: {pitch.hb} in</p>
-                    <p>VB: {pitch.vb} in</p>
-                  </div>
-                );
-              }
-              return null;
-              }}
-            />
-            
-            <Legend
-              verticalAlign="middle"
-              align="right"
-              layout="vertical"
-              content={renderCustomLegend}
-            />
+                <Tooltip
+                  cursor={{ strokeDasharray: "3 3", stroke: "#4b5563" }}
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      const pitch = payload[0].payload as Pitch;
+                      const color = PITCH_COLORS[pitch.pitch_type] || "#9ca3af";
+                      return (
+                        <div className="rounded-lg border border-gray-700 bg-gray-900 px-3 py-2 shadow-lg text-sm">
+                          <p className="font-semibold mb-1" style={{ color, fontFamily: FONT }}>
+                            {pitch.pitch_type}
+                          </p>
+                          <p className="text-gray-300">HB: <span className="text-white">{pitch.hb} in</span></p>
+                          <p className="text-gray-300">VB: <span className="text-white">{pitch.vb} in</span></p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
 
+                {displayEntries.map(([pitchType, pitches]) => (
+                  <Scatter
+                    key={pitchType}
+                    name={pitchType}
+                    data={pitches}
+                    fill={PITCH_COLORS[pitchType] || "#6b7280"}
+                    opacity={0.85}
+                  />
+                ))}
+              </ScatterChart>
+            </ResponsiveContainer>
+          </div>
 
-            {finalEntries.map(([pitchType, pitches]) => (
-              <Scatter
-                key={pitchType}
-                name={pitchType}
-                data={pitches}
-                fill={pitchColors[pitchType] || "#999999"} // gray fallback for unknown
-              />
-            ))}
-          </ScatterChart>
-        </ResponsiveContainer>
-      </div>
-    </div>
+          {/* Toggle buttons — vertical, matching velocity chart style */}
+          <div className="flex flex-col gap-2 justify-center pl-2">
+            <p className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-1">Pitch Types</p>
+            <button
+              onClick={() => setActivePitchType("All")}
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors border ${
+                activePitchType === "All"
+                  ? "bg-gray-200 text-gray-900 border-gray-200"
+                  : "bg-transparent text-gray-400 border-gray-600 hover:border-gray-400 hover:text-gray-200"
+              }`}
+            >
+              All
+            </button>
+            {pitchTypes.map((type) => {
+              const color = PITCH_COLORS[type] || "#6b7280";
+              const isActive = activePitchType === type;
+              return (
+                <button
+                  key={type}
+                  onClick={() => setActivePitchType(type)}
+                  style={
+                    isActive
+                      ? { backgroundColor: color, borderColor: color, color: "#fff" }
+                      : { borderColor: color, color: color }
+                  }
+                  className="px-3 py-1 rounded-full text-sm font-medium transition-colors border bg-transparent hover:opacity-80"
+                >
+                  {type}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
-

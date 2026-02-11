@@ -33,6 +33,7 @@ const PITCH_COLORS: Record<string, string> = {
 export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
   const [chartData, setChartData] = React.useState<any[]>([])
   const [pitchTypes, setPitchTypes] = React.useState<string[]>([])
+  const [activePitchType, setActivePitchType] = React.useState<string>("All")
   const [loading, setLoading] = React.useState(true)
   const [error, setError] = React.useState<string | null>(null)
 
@@ -60,9 +61,6 @@ export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
         const formatted = Array.from(pitchNumberMap.values()).sort((a, b) => a.pitch_number - b.pitch_number)
         const types = Array.from(typesSet)
 
-        console.log("Formatted chart data:", formatted)
-        console.log("Pitch types:", types)
-
         setChartData(formatted)
         setPitchTypes(types)
       } catch (err: any) {
@@ -85,9 +83,37 @@ export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
   pitchTypes.forEach((type, index) => {
     chartConfig[type] = {
       label: type,
-      color: PITCH_COLORS[type] || `hsl(${index * 60}, 70%, 50%)`, // Fallback colors
+      color: PITCH_COLORS[type] || `hsl(${index * 60}, 70%, 50%)`,
     }
   })
+
+  // Re-index x from 1 for both "All" and single pitch type views
+  const displayData = activePitchType === "All"
+    ? chartData.map((point, index) => ({ ...point, pitch_number: index + 1 }))
+    : chartData
+        .filter(point => point[activePitchType] != null)
+        .map((point, index) => ({ ...point, pitch_number: index + 1 }))
+
+  const displayTypes = activePitchType === "All" ? pitchTypes : [activePitchType]
+
+  // Dynamic Y-axis: min velocity - 5 to max velocity + 5
+  let minVel = Infinity
+  let maxVel = -Infinity
+  displayData.forEach(point => {
+    displayTypes.forEach(type => {
+      const v = point[type]
+      if (v != null) {
+        if (v < minVel) minVel = v
+        if (v > maxVel) maxVel = v
+      }
+    })
+  })
+  const yMin = minVel === Infinity ? 70 : Math.floor(minVel) - 5
+  const yMax = maxVel === -Infinity ? 100 : Math.ceil(maxVel) + 5
+  const yTicks: number[] = []
+  for (let t = Math.ceil(yMin / 5) * 5; t <= yMax; t += 5) {
+    yTicks.push(t)
+  }
 
   return (
     <Card className="py-4 sm:py-0">
@@ -96,13 +122,45 @@ export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
         <CardDescription>Track velocity trends across pitch numbers for each pitch type.</CardDescription>
       </CardHeader>
 
+      {/* Pitch type toggle buttons */}
+      <div className="flex flex-wrap gap-2 px-6 pb-2">
+        <button
+          onClick={() => setActivePitchType("All")}
+          className={`px-3 py-1 rounded-full text-sm font-medium transition-colors border ${
+            activePitchType === "All"
+              ? "bg-gray-200 text-gray-900 border-gray-200"
+              : "bg-transparent text-gray-400 border-gray-600 hover:border-gray-400 hover:text-gray-200"
+          }`}
+        >
+          All
+        </button>
+        {pitchTypes.map((type) => {
+          const color = chartConfig[type].color
+          const isActive = activePitchType === type
+          return (
+            <button
+              key={type}
+              onClick={() => setActivePitchType(type)}
+              style={
+                isActive
+                  ? { backgroundColor: color, borderColor: color, color: "#fff" }
+                  : { borderColor: color, color: color }
+              }
+              className={`px-3 py-1 rounded-full text-sm font-medium transition-colors border bg-transparent hover:opacity-80`}
+            >
+              {type}
+            </button>
+          )
+        })}
+      </div>
+
       <CardContent className="px-2 sm:p-6">
         <ChartContainer
           config={chartConfig}
           className="h-[420px] sm:h-[520px] w-full"
         >
           <LineChart
-            data={chartData}
+            data={displayData}
             margin={{ top: 30, bottom: 30, left: 24, right: 24 }}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} />
@@ -112,6 +170,7 @@ export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
               tickLine={false}
               axisLine={false}
               padding={{ left: 20, right: 20 }}
+              allowDecimals={false}
               label={{ value: "Pitch Number", position: "insideBottom", offset: -10 }}
             />
 
@@ -119,8 +178,8 @@ export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
               tickLine={false}
               axisLine={false}
               label={{ value: "Velocity (mph)", angle: -90, position: "insideLeft" }}
-              domain={[70, 100]}
-              ticks={[70, 75, 80, 85, 90, 95, 100]}
+              domain={[yMin, yMax]}
+              ticks={yTicks}
             />
 
             <ChartTooltip
@@ -136,8 +195,7 @@ export function VelocityByPitchTypeChart({ fileId }: { fileId: string }) {
               iconType="line"
             />
 
-            {/* Render a Line for each pitch type */}
-            {pitchTypes.map((type) => (
+            {displayTypes.map((type) => (
               <Line
                 key={type}
                 type="monotone"
