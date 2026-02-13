@@ -1,4 +1,22 @@
-services: 
+services:
+  postgres:
+    image: postgres:16-alpine
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $DB_USER -d $DB_NAME"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   frontend: 
     build: 
       context: ./frontend
@@ -14,7 +32,7 @@ services:
     command: npm run dev
   
   backend:
-    build: 
+    build:
       context: ./backend
       dockerfile: Dockerfile
     ports:
@@ -23,5 +41,11 @@ services:
       - ./backend:/backend
     env_file:
       - .env
+    depends_on:
+      postgres:
+        condition: service_healthy
     #command run from app/main.py with app object inside
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
