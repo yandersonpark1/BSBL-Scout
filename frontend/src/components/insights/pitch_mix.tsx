@@ -112,8 +112,8 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
                   dataKey="hb"
                   name="Horizontal Break"
                   unit="in"
-                  domain={[-40, 40]}
-                  ticks={[-40, -30, -20, -10, 0, 10, 20, 30, 40]}
+                  domain={[-30, 30]}
+                  ticks={[-30, -20, -10, 0, 10, 20, 30]}
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#111827", fontSize: 13, fontFamily: FONT }}
@@ -125,8 +125,8 @@ export default function PitchMixChart({ fileId }: { fileId: string }) {
                   dataKey="vb"
                   name="Vertical Break"
                   unit="in"
-                  domain={[-40, 40]}
-                  ticks={[-40, -30, -20, -10, 0, 10, 20, 30, 40]}
+                  domain={[-30, 30]}
+                  ticks={[-30, -20, -10, 0, 10, 20, 30]}
                   axisLine={false}
                   tickLine={false}
                   tick={{ fill: "#111827", fontSize: 13, fontFamily: FONT }}
