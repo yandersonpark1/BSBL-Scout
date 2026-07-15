@@ -1,0 +1,50 @@
+# BSBL-Scout — runs fully in-memory, no database service required.
+#
+# Dev-oriented compose: both services run their live-reload dev servers with the
+# source bind-mounted, so edits on the host reload inside the container.
+#
+#   docker compose up --build
+#     frontend → http://localhost:5173
+#     API/docs → http://localhost:8000/docs
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: bsbl-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/backend
+    environment:
+      # Allow the Vite dev server to call the API.
+      - CORS_ORIGINS=http://localhost:5173,http://127.0.0.1:5173
+    # The `app` object lives in app/main.py.
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    # python-slim has no curl/wget, so probe /health with the stdlib.
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: bsbl-frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/frontend
+      # Anonymous volume protects the image's node_modules from being shadowed
+      # by the host bind-mount above.
+      - /frontend/node_modules
+    environment:
+      - HOST=0.0.0.0
+    command: npm run dev
+    # Start the UI once the API is up (the browser calls it on upload).
+    depends_on:
+      backend:
+        condition: service_healthy

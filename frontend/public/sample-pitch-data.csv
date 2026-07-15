@@ -1,0 +1,7 @@
+"Player ID:",
+"Player Name:",
+
+"No","Date","Pitch ID","Pitch Type","Is Strike","Strike Zone Side","Strike Zone Height","Velocity","Total Spin","True Spin (release)","Spin Efficiency (release)","Spin Direction","Spin Confidence","VB (trajectory)","HB (trajectory)","SSW VB","SSW HB","VB (spin)","HB (spin)","Horizontal Angle","Release Angle","Release Height","Release Side","Gyro Degree (deg)","Unique ID","Device Serial Number","SO - latLongConfidence","SO - latitude","SO - longitude","SO - rotMatConfidence","SO - timestamp","SO - Xx","SO - Xy","SO - Xz","SO - Yx","SO - Yy","SO - Yz","SO - Zx","SO - Zy","SO - Zz","Horizontal Approach Angle","Vertical Approach Angle","Session Name","Intent Type","Release Extension (ft)"
+1,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+2,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
+3,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,
